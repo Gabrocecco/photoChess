@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 13
+names: ['bishop', 'black-bishop', 'black-king', 'black-knight', 'black-pawn', 'black-queen', 'black-rook', 'white-bishop', 'white-king', 'white-knight', 'white-pawn', 'white-queen', 'white-rook']
+
+roboflow:
+  workspace: joseph-nelson
+  project: chess-pieces-new
+  version: 24
+  license: Public Domain
+  url: https://universe.roboflow.com/joseph-nelson/chess-pieces-new/dataset/24
