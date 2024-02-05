@@ -9,6 +9,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -16,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
+
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {

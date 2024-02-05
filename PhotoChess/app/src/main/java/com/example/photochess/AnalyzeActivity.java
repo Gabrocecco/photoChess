@@ -36,8 +36,7 @@ public class AnalyzeActivity extends AppCompatActivity {
 
         File file = new File(getFilesDir(), "boardPhoto");
         Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
-        boardPhoto.setImageBitmap(bitmap);
-
+        boardPhoto.setImageResource(R.drawable.chessboard);
         nextMoveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
