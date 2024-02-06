@@ -7,7 +7,7 @@ img_captured_1 = cv2.imread('test.jpg')
 gray1 = cv2.cvtColor(img_captured_1,cv2.COLOR_BGR2GRAY)
 img_captured_2 = cv2.imread('test_v.jpg')
 gray2 = cv2.cvtColor(img_captured_2,cv2.COLOR_BGR2GRAY)
-#plt.imshow(img_captured)
+#cv2.imshow("gray1", gray1)
 #cv2.waitKey(0)
 
 pattern = (7, 7)
@@ -24,17 +24,24 @@ ret2, corners2 = cv2.findChessboardCorners(gray2, pattern,
 
 H, _ = cv2.findHomography(corners1, corners2)
 print(H)
-img1_warp = cv2.warpPerspective(img_captured_1, H, (img_captured_1.shape[1]+400, img_captured_1.shape[0]+900))
+img1_warp = cv2.warpPerspective(gray1, H, (gray1.shape[1]+400, gray1.shape[0]+900))
+
+
+cv2.imwrite("img1_warp_before_harris.jpg", img1_warp) 
+#cv2.imshow("img1_warp", img1_warp)
+#cv2.waitKey(0)
+
 #blur = cv2.GaussianBlur(img1_warp,(5,5),0)
 #_, img_binary = cv2.threshold(blur,120,255,cv2.THRESH_BINARY)
 
 gray_harrys = np.float32(img1_warp)
 dst = cv2.cornerHarris(gray_harrys,2,3,0.04)
 #result is dilated for marking the corners, not important
-dst = cv2.dilate(dst,None)
-img1_warp[dst>0.01*dst.max()]=[0,0,255]
 
-cv2.imshow('dst',img1_warp)
-cv2.waitKey(0)
+dst = cv2.dilate(dst,None)
+#img1_warp[dst>0.01*dst.max()]=[0,0,255]
+
+cv2.imwrite("img1_warp_after_harris.jpg", dst) 
+#cv2.waitKey(0)
 
 

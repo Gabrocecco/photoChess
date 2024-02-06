@@ -23,10 +23,10 @@ ret2, corners2 = cv2.findChessboardCorners(img_captured_2, pattern,
 H, _ = cv2.findHomography(corners1, corners2)
 print(H)
 img1_warp = cv2.warpPerspective(img_captured_1, H, (img_captured_1.shape[1]+400, img_captured_1.shape[0]+900))
-blur = cv2.GaussianBlur(img1_warp,(5,5),0)
-_, img_binary = cv2.threshold(blur,120,255,cv2.THRESH_BINARY)
+#blur = cv2.GaussianBlur(img1_warp,(5,5),0)
+#_, img_binary = cv2.threshold(blur,120,255,cv2.THRESH_BINARY)
 cv2.imwrite("img1_warp.jpg", img1_warp) 
-cv2.imshow("img1_warp", img_binary)
+cv2.imshow("img1_warp", img1_warp)
 cv2.waitKey(0)
 
 
@@ -35,7 +35,7 @@ pattern = (8, 8)
 for i in range(3,10):
     for j in range(3,10):
         pattern = (i, j)
-        ret3, corners3 = cv2.findChessboardCorners(img_binary, pattern,
+        ret3, corners3 = cv2.findChessboardCorners(img1_warp, pattern,
                                          flags=cv2.CALIB_CB_ADAPTIVE_THRESH +
                                                cv2.CALIB_CB_FAST_CHECK +
                                                cv2.CALIB_CB_NORMALIZE_IMAGE)
@@ -44,7 +44,8 @@ for i in range(3,10):
             print(i)
             print()
             print(j)
-            fnl = cv2.drawChessboardCorners(img_binary, pattern, corners3, ret3)
+            fnl = cv2.drawChessboardCorners(img1_warp, pattern, corners3, ret3)
+            cv2.imwrite("img1_warp_corners.jpg", img1_warp) 
             cv2.imshow("fnl", fnl)
             cv2.waitKey(0)
         else:
