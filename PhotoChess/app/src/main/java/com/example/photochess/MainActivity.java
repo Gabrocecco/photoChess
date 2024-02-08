@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(getColor(R.color.mycol));
         }
 
-        Button btn = (Button)findViewById(R.id.photoButton);
+        ImageView btn = (ImageView) findViewById(R.id.photoButton);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override

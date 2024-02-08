@@ -15,10 +15,10 @@ def getbestmove(fen):
 
 def getboard(fen):
     board = chess.Board(fen)
-    svg = chess.svg.board(board)
+    svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"})
     return svg
 
 def getmoveboard(fen, fromString, toString):
     board = chess.Board(fen)
-    svg = chess.svg.board(board, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#FF0000")])
+    svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
     return svg
