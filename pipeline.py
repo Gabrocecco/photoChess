@@ -61,8 +61,8 @@ def four_point_transform(image, pts):
     return img
 
 
-starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
-
+#starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
+starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0003.jpg"
 
 model_corner = YOLO("best_corners_repo.pt")
 results = model_corner.predict(starting_image_link, conf=0.001, iou=0.1, imgsz=640, max_det=4, save=True)
@@ -81,7 +81,7 @@ for corner in corners:
     plt.scatter(corner[0], corner[1], color=colors[index])
     index = index + 1
 
-#plt.show()
+plt.show()
 
 
 
@@ -118,14 +118,23 @@ heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
 heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
 maxHeight = max(int(heightA), int(heightB))
 
-warped = cv2.warpPerspective(image, M, (maxWidth+3000, maxHeight+3000))
+# construct set of destination points to obtain a "birds eye view"
+dst = np.array([
+    [0, 0],
+    [maxWidth - 1, 0],
+    [maxWidth - 1, maxHeight - 1],
+    [0, maxHeight - 1]], dtype = "float32")
+
+M = cv2.getPerspectiveTransform(corners, dst)
+
+warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 img = Image.fromarray(warped, "RGB")
 img.save("p_test.jpg")
 
 
 img.show()
 #img.save("test_images\test_images_real\out_prospective.jpg")
-model_pieces = YOLO("training_output\content\\runs\detect\\train2_200_epocs\weights\\best.pt")
+model_pieces = YOLO.predict("training_output\content\\runs\detect\\train2_200_epocs\weights\\best.pt")
 results = model_pieces.predict("p_test.jpg",save=True)
 
 
