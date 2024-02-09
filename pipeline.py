@@ -84,25 +84,9 @@ def connect_square_to_detection(points, ptsT, ptsL):
     square_list_centers = []
     for t in range(1,len(ptsT)):
         for l in range(1,len(ptsL)):
-            pTt = ptsT[t]
-            pTt = pTt[0]
-
-            pTt_1 = ptsT[t-1]
-            pTt_1 = pTt_1[0]
-
-            pLl = ptsL[l]
-            pLl = pLl[1]
-
-            pLl_1 = ptsL[l-1]
-            pLl_1 = pLl_1[1]
-
-            x = pTt - pTt_1
-            y = pLl - pLl_1
-
-
-            # x =  ptsT[t][0] - ptsT[t-1][0]
+            # # x =  ptsT[t][0] - ptsT[t-1][0]
             
-            # y =  ptsL[l][1] - ptsL[l-1][1]
+            # # y =  ptsL[l][1] - ptsL[l-1][1]
 
             # print(np.array(ptsT[t])[0])
             # print(np.array(ptsT[t])[1])
