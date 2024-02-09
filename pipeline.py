@@ -1,11 +1,11 @@
 from ultralytics import YOLO
 from PIL import Image
-from IPython.display import display
 import os
 import cv2
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import numpy as np
+from scipy import spatial
 
 # order points in this way:
     # 0: top-left,
@@ -70,41 +70,47 @@ def plot_grid_on_transformed_image(image):
 
 # connects detected piece to the right square
 
-def connect_square_to_detection(points, ptsT, ptsL):
+def connect_square_to_detection(points, ptsT, ptsL, classes):
     
-    # di = {0: 'b', 1: 'k', 2: 'n',
-    #   3: 'p', 4: 'q', 5: 'r', 
-    #   6: 'B', 7: 'K', 8: 'N',
-    #   9: 'P', 10: 'Q', 11: 'R'}
-    
-    # print("ciao")
-    # print(ptsT)
-    # print("\n")
-    # print(ptsL)
     square_list_centers = []
-    for t in range(1,len(ptsT)):
-        for l in range(1,len(ptsL)):
-            # # x =  ptsT[t][0] - ptsT[t-1][0]
-            
-            # # y =  ptsL[l][1] - ptsL[l-1][1]
-
+    #for l in range(0,len(ptsL)-1):
+    #    for t in range(0,len(ptsT)-1):
+        
             # print(np.array(ptsT[t])[0])
             # print(np.array(ptsT[t])[1])
-            p = [x,y]
+            
+    #        square_list_centers.append([(ptsT[t][0]) + ((ptsT[1][0]/2)),  (ptsL[l][1]) + ((ptsL[1][1]/2))])
+    
+
+    for t in range(len(ptsT)-2, -1, -1):
+        for l in range(0, len(ptsT)-1):
             print(t)
-            print(l)
-            print("\n")
-            print(p)
-            square_list_centers.append(p)
+            square_list_centers.append([(ptsT[t][0]) + ((ptsT[1][0]/2)),  (ptsL[l][1]) + ((ptsL[1][1]/2))])
+    
+    print(square_list_centers)
+
+    cells = spatial.KDTree(square_list_centers)
+    index = 0
+    image_11 = plt.imread("p_test.jpg")
+    
+    for point in points:
+        index = index + 1
+        cell = cells.query([point[0], point[1]])
+        plt.scatter(point[0], point[1])
+        plt.scatter(square_list_centers[cell[1]][0], square_list_centers[cell[1]][1], marker='x')
+        print(cell[1])
+    plt.imshow(image_11)
+    plt.show()
+
     return 
 
 
 # Orginal phote taken by the app
 #starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
-starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0003.jpg"
+starting_image_link = "IMG-20240208-WA0003.jpg"
 
 #detect pieces with otiginal yolo model 
-model_pieces = YOLO("training_output\content\\runs\detect\\train2_200_epocs\weights\\best.pt")
+model_pieces = YOLO("best.pt")
 results_pieces_original = model_pieces.predict(starting_image_link, save=True, iou=0.2, show=False, project="yolo_output_final_warped", name="on_original_perspective", exist_ok=True)
 
 #chessboard corner detection 
@@ -113,9 +119,9 @@ results = model_corner.predict(starting_image_link, conf=0.001, iou=0.1, imgsz=6
 boxes = results[0].boxes
 arr = boxes.xywh.numpy()
 points = arr[:,0:2]
-print("POINTS: \n"+ str(points)+"\n\n")
+#print("POINTS: \n"+ str(points)+"\n\n")
 corners = order_points(points)
-print("CORNERS: \n"+ str(corners)+"\n\n")
+#print("CORNERS: \n"+ str(corners)+"\n\n")
 img_show = plt.imread(starting_image_link)
 #plt.imshow(img_show)
 
@@ -167,7 +173,6 @@ dst = np.array([
     [0, maxHeight - 1]], dtype = "float32")
 
 M = cv2.getPerspectiveTransform(corners, dst)
-print("TRANSFORM MATRIX: \n"+str(M)+"\n\n")
 img = Image.open(starting_image_link)
 image = np.asarray(img)
 warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
@@ -178,11 +183,10 @@ img_warped.save("p_test.jpg")
 
 
 boxes = results_pieces_original[0].boxes
+classes = boxes.cls
 arr = boxes.xywh.numpy()
 points = arr[:,0:2]
-print("POINTS_DETECTS_ORIGINAL: \n"+ str(points)+"\n\n")
 points = np.float32(np.array(points))
-print("POINTS_DETECTS_ORIGINAL: \n"+ str(points)+"\n\n")
 
 list_point_detetcts = []
 
@@ -194,8 +198,6 @@ for point in points:
     print(new_point)
     list_point_detetcts.append(new_point)
 
-print(len(list_point_detetcts))
-np.size(list_point_detetcts)
 
 
 img = plt.imread("p_test.jpg")
@@ -203,8 +205,8 @@ index = 0
 for point in list_point_detetcts:
     plt.scatter(point[0], point[1])
     index = index + 1
-plt.imshow(img)
-plt.show()
+#plt.imshow(img)
+#plt.show()
 
 
 
@@ -219,13 +221,13 @@ index = 0
 for point in list_point_detetcts:
     plt.scatter(point[0], point[1])
     index = index + 1
-plt.imshow(img)
-plt.show()
+#plt.imshow(img)
+#plt.show()
 
 
 
 
-connect_square_to_detection(list_point_detetcts, ptsT, ptsL)
+connect_square_to_detection(list_point_detetcts, ptsT, ptsL, classes)
 #conf_par = 0.1
 #results = model_pieces.predict("p_test.jpg", save=True, show=False, project="yolo_output_final_warped",name="on_warped_perspective", exist_ok=True)
 
