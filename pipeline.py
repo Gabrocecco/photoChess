@@ -107,10 +107,11 @@ def connect_square_to_detection(points, ptsT, ptsL, classes):
 
 # Orginal phote taken by the app
 #starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
-starting_image_link = "IMG-20240208-WA0003.jpg"
+# starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0003.jpg"
+starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0007.jpg"
 
 #detect pieces with otiginal yolo model 
-model_pieces = YOLO("best.pt")
+model_pieces = YOLO("training_output\content\\runs\detect\\train2_200_epocs\weights\\best.pt")
 results_pieces_original = model_pieces.predict(starting_image_link, save=True, iou=0.2, show=False, project="yolo_output_final_warped", name="on_original_perspective", exist_ok=True)
 
 #chessboard corner detection 
