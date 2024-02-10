@@ -1,3 +1,40 @@
 <resources>
     <string name="app_name">PhotoChess</string>
+    <string-array name="columns_array">
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>G</item>
+        <item>H</item>
+    </string-array>
+
+    <string-array name="line_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+
+    <string-array name="pieces_array">
+        <item>Empty</item>
+        <item>White Pawn</item>
+        <item>White Bishop</item>
+        <item>White Knight</item>
+        <item>White Rook</item>
+        <item>White Queen</item>
+        <item>White King</item>
+        <item>Black Pawn</item>
+        <item>Black Bishop</item>
+        <item>Black Knight</item>
+        <item>Black Rook</item>
+        <item>Black Queen</item>
+        <item>Black King</item>
+    </string-array>
 </resources>
