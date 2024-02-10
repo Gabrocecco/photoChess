@@ -1,6 +1,5 @@
 from ultralytics import YOLO
 from PIL import Image
-import os
 import cv2
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
@@ -87,29 +86,30 @@ def connect_square_to_detection(points, ptsT, ptsL, classes):
 
     for t in range(len(ptsT)-2, -1, -1):
         for l in range(0, len(ptsT)-1):
-            print(t)
+            # print(t)
             square_list_centers.append([(ptsT[t][0]) + ((ptsT[1][0]/2)),  (ptsL[l][1]) + ((ptsL[1][1]/2))])
     
-    print(square_list_centers)
+    # print(square_list_centers)
 
     cells = spatial.KDTree(square_list_centers)
     index = 0
     
     chessboard_list = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
-
+    # img = plt.imread("chessboard_transformed_with_grid.jpg")
     for point in points:
         cell = cells.query([point[0], point[1]])
-        #plt.scatter(point[0], point[1])
-        #plt.scatter(square_list_centers[cell[1]][0], square_list_centers[cell[1]][1], marker='x')
+        plt.scatter(point[0], point[1])
+        # plt.scatter(square_list_centers[cell[1]][0], square_list_centers[cell[1]][1], marker='x')
         if(len(chessboard_list[cell[1]]) < 1):
             chessboard_list[cell[1]] = dictPieces[classes[index].item()]
         index = index + 1
 
-    #plt.imshow(image_11)
-    #plt.show()
+
+    # plt.imshow(img)
+    # plt.show()
     fen = create_fen(chessboard_list)
-    print(fen)
-    return 
+    # print(fen)
+    return fen
 
 def create_fen(chessboard_list):
 
@@ -155,6 +155,7 @@ results_pieces_original = model_pieces.predict(starting_image_link, save=True, i
 input_file_name = starting_image_link.split("/")[1]
 yolo_detect_pieces_on_input = plt.imread("yolo_output_final_warped/on_original_perspective/"+ input_file_name)
 plt.imshow(yolo_detect_pieces_on_input)
+plt.axis('off')
 plt.show()
 
 #chessboard corner detection 
@@ -163,9 +164,10 @@ results = model_corner.predict(starting_image_link, save=True, conf=0.001, iou=0
 #show yolo detects 
 yolo_detect_pieces_on_input = plt.imread("yolo_output_final_warped/corners_detects/"+ input_file_name)
 plt.imshow(yolo_detect_pieces_on_input)
+plt.axis('off')
 plt.show()
 
-#estract corners coordinates and orders them 
+#extract corners coordinates and orders them 
 boxes = results[0].boxes
 arr = boxes.xywh.numpy()
 points = arr[:,0:2]
@@ -207,56 +209,51 @@ warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 img_warped = Image.fromarray(warped, "RGB")
 img_warped.save("warped_image.jpg")
 plt.imshow(img_warped)
-plt.show()
+# plt.show()
 
-
+#extract yolo detects of pieces in the original images (coordinates and classes)
 boxes = results_pieces_original[0].boxes
 classes = boxes.cls
 arr = boxes.xywh.numpy()
 points = arr[:,0:2]
 points = np.float32(np.array(points))
 
+#trasforms all coordinates of yolo detects into new perspective using the same trasnformation matrix 
 list_point_detetcts = []
-
 for point in points:
     p = np.float32(np.array([[point]]))
     new_point = cv2.perspectiveTransform(p, M)
     new_point = new_point[0][0]
     new_point[1] = new_point[1] + 40
-    print(new_point)
+    # print(new_point)
     list_point_detetcts.append(new_point)
 
-
-
+#diplayng new coordinates of yolo detects into warped imaage for showing purposes 
 img = plt.imread("warped_image.jpg")
 index = 0
 for point in list_point_detetcts:
     plt.scatter(point[0], point[1])
     index = index + 1
-#plt.imshow(img)
-#plt.show()
+plt.imshow(img)
+plt.axis('off')
+plt.savefig('warped_image_with_detects.jpg', bbox_inches='tight', pad_inches=0)
+plt.show()
+
+#display grid on warped image and returning coordinates of every column from top and every line from the left
+ptsT, ptsL = plot_grid_on_transformed_image(img_warped)   #without scattaer
+# warped_image_with_detects = Image.open('warped_image_with_detects.jpg')
+# ptsT, ptsL = plot_grid_on_transformed_image(warped_image_with_detects) #with scattaer
+# print(ptsT)
+# print(ptsL)
+plt.close()
+grid_image = plt.imread("chessboard_transformed_with_grid.jpg")
+plt.imshow(grid_image)
+plt.axis('off')
+plt.show()
 
 
+fen = connect_square_to_detection(list_point_detetcts, ptsT, ptsL, classes)
+print(fen)
 
-ptsT, ptsL = plot_grid_on_transformed_image(img_warped)
-
-print(ptsT)
-print(ptsL)
-
-img = plt.imread("chessboard_transformed_with_grid.jpg")
-# img = plt.imread("Figure_1.png")
-index = 0
-for point in list_point_detetcts:
-    plt.scatter(point[0], point[1])
-    index = index + 1
-#plt.imshow(img)
-#plt.show()
-
-
-
-
-connect_square_to_detection(list_point_detetcts, ptsT, ptsL, classes)
-#conf_par = 0.1
-#results = model_pieces.predict("p_test.jpg", save=True, show=False, project="yolo_output_final_warped",name="on_warped_perspective", exist_ok=True)
 
 
