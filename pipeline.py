@@ -141,18 +141,31 @@ def create_fen(chessboard_list):
     fen = fen + " w KQkq - 0 1"
     return fen
 
+
+
 # Orginal phote taken by the app
 #starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
 # starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0003.jpg"
 starting_image_link = "test_images/47237294-c5a012dfa72816098d23fc8baee67834_jpg.rf.e3f72193f30138545bf762265f30083f.jpg"
 
 #detect pieces with otiginal yolo model 
-model_pieces = YOLO("training_output/content/runs/detect/train2_200_epocs/weights/best.pt")
+model_pieces = YOLO("best_piecies.pt")
 results_pieces_original = model_pieces.predict(starting_image_link, save=True, iou=0.2, show=False, project="yolo_output_final_warped", name="on_original_perspective", exist_ok=True)
+#show yolo detects 
+input_file_name = starting_image_link.split("/")[1]
+yolo_detect_pieces_on_input = plt.imread("yolo_output_final_warped/on_original_perspective/"+ input_file_name)
+plt.imshow(yolo_detect_pieces_on_input)
+plt.show()
 
 #chessboard corner detection 
-model_corner = YOLO("best_corners_repo.pt")
-results = model_corner.predict(starting_image_link, conf=0.001, iou=0.1, imgsz=640, max_det=4, save=False)
+model_corner = YOLO("best_corners.pt")
+results = model_corner.predict(starting_image_link, save=True, conf=0.001, iou=0.1, imgsz=640, max_det=4,  show=False, project="yolo_output_final_warped", name="corners_detects", exist_ok=True)
+#show yolo detects 
+yolo_detect_pieces_on_input = plt.imread("yolo_output_final_warped/corners_detects/"+ input_file_name)
+plt.imshow(yolo_detect_pieces_on_input)
+plt.show()
+
+#estract corners coordinates and orders them 
 boxes = results[0].boxes
 arr = boxes.xywh.numpy()
 points = arr[:,0:2]
@@ -162,30 +175,7 @@ corners = order_points(points)
 img_show = plt.imread(starting_image_link)
 #plt.imshow(img_show)
 
-
-# plotting the corners in original image 
-# colors = ["red", "yellow", "blue", "purple"]
-# index = 0
-# for corner in corners:
-#     plt.scatter(corner[0], corner[1], color=colors[index])
-#     index = index + 1
-# plt.show()
-
-
-# results_master = model_corner.predict("test_images\\test_images_real\master_chessbord.jpg", conf=0.001, iou=0.1, imgsz=640, max_det=4, save=True)
-# img_link = starting_image_link
-# img = Image.open(img_link)
-# image = np.asarray(img)
-# dst_master = np.array([
-#  [     114.75  ,     104.9],
-#  [     1931.7   ,   108.47],
-#  [     1926.4   ,   1890.1],
-#  [     111.55   ,   1873.8]], dtype = "float32")
-# M = cv2.getPerspectiveTransform(corners, dst_master)
-
-# print(M)
-#warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-
+#assigning logical names to individual corners coordinates 
 tl = corners[0]
 tr = corners[1]
 br = corners[2]
@@ -196,7 +186,6 @@ widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
 widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
 maxWidth = max(int(widthA), int(widthB))
    
-
 # compute the height of the new image
 heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
 heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
@@ -209,14 +198,16 @@ dst = np.array([
     [maxWidth - 1, maxHeight - 1],
     [0, maxHeight - 1]], dtype = "float32")
 
+#calculate the persepctive transform matrix 
 M = cv2.getPerspectiveTransform(corners, dst)
 img = Image.open(starting_image_link)
 image = np.asarray(img)
+#warping perspective of input image
 warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
 img_warped = Image.fromarray(warped, "RGB")
-img_warped.save("p_test.jpg")
-# img.show()
-
+img_warped.save("warped_image.jpg")
+plt.imshow(img_warped)
+plt.show()
 
 
 boxes = results_pieces_original[0].boxes
@@ -237,7 +228,7 @@ for point in points:
 
 
 
-img = plt.imread("p_test.jpg")
+img = plt.imread("warped_image.jpg")
 index = 0
 for point in list_point_detetcts:
     plt.scatter(point[0], point[1])

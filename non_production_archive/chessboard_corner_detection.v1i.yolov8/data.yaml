@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['corner']
+
+roboflow:
+  workspace: chessreff
+  project: chessboard-corner-detection
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/chessreff/chessboard-corner-detection/dataset/1
