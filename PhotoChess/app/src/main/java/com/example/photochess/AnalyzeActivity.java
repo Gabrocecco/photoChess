@@ -26,7 +26,7 @@ import java.io.File;
 public class AnalyzeActivity extends AppCompatActivity {
 
     ImageView nextMoveBtn;
-    String fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2";
+    String fen = "";
     PyObject module;
     ImageView boardPhoto;
     @Override
@@ -40,6 +40,9 @@ public class AnalyzeActivity extends AppCompatActivity {
         {
             getWindow().setStatusBarColor(getColor(R.color.mycol));
         }
+
+        Intent intent = getIntent();
+        fen = intent.getExtras().getString("fen");
 
         nextMoveBtn = findViewById(R.id.bmoveBtn);
         if (! Python.isStarted()) {

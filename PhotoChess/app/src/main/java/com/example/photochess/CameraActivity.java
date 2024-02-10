@@ -1,12 +1,10 @@
 package com.example.photochess;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
-import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -14,38 +12,27 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Paint;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
 import java.util.concurrent.Executor;
 
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener{
@@ -60,6 +47,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView imageView;
     private ImageCapture imageCapt;
     private ImageAnalysis imageAn;
+
+    PyObject module;
 
 
     @Override
@@ -88,6 +77,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         undoBtn.setOnClickListener(this);
         undoBtn.setVisibility(View.INVISIBLE);
         useBtn.setVisibility(View.INVISIBLE);
+
+        if (! Python.isStarted()) {
+            Python.start(new AndroidPlatform(this));
+        }
+        Python py = Python.getInstance();
+        module = py.getModule("getbestmove");
+
         provider = ProcessCameraProvider.getInstance(this);
         provider.addListener( () ->
         {
@@ -216,8 +212,42 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     public void usePhoto(){
 
-        savePhoto(previewView.getBitmap());
-        startActivity(new Intent(CameraActivity.this, AnalyzeActivity.class));
+        Bitmap image = previewView.getBitmap();
+        String[] choices = {"WHITE","BLACK"};
+
+
+
+        int currentChoice = 0;
+        final int[] effectiveChoice = {0};
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Whose turn is it?");
+        builder.setView(customLayout);
+        builder.setIcon(R.drawable.blackrook);
+        builder.setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        RadioButton blackbtn = customLayout.findViewById(R.id.blackButton);
+                        String turn = "w";
+                        if(blackbtn.isChecked()){
+                            turn = "b";
+                        }
+                        Log.e("turn", turn);
+                        //call python function to obtain the fen
+
+                        PyObject fenPy = module.callAttr("getfen", image, turn);
+                        Intent i = new Intent(CameraActivity.this, AnalyzeActivity.class);
+                        i.putExtra("fen", fenPy.toString());
+                        startActivity(i);
+                        //startActivity(new Intent(CameraActivity.this, AnalyzeActivity.class));
+                    }
+                });
+
+                // A null listener allows the button to dismiss the dialog and take no further action.
+        builder.setNegativeButton(android.R.string.no, null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.mygreen));
+        alert.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.mycol));
 
     }
 

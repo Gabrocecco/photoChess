@@ -22,3 +22,7 @@ def getmoveboard(fen, fromString, toString):
     board = chess.Board(fen)
     svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
     return svg
+
+def getfen(bitmapImage, turn):
+    #allFunctions
+    return "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R " + turn + " KQkq - 1 2"
