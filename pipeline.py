@@ -81,6 +81,9 @@ def connect_square_to_detection(points, ptsT, ptsL, classes):
             
     #        square_list_centers.append([(ptsT[t][0]) + ((ptsT[1][0]/2)),  (ptsL[l][1]) + ((ptsL[1][1]/2))])
     
+    dictPieces = {
+        1:'b', 2:'k', 3:'n', 4:'p', 5:'q', 6:'r', 7:'B', 8:'K', 9:'N', 10:'P', 11:'Q', 12:'R'
+    }
 
     for t in range(len(ptsT)-2, -1, -1):
         for l in range(0, len(ptsT)-1):
@@ -91,27 +94,60 @@ def connect_square_to_detection(points, ptsT, ptsL, classes):
 
     cells = spatial.KDTree(square_list_centers)
     index = 0
-    image_11 = plt.imread("p_test.jpg")
     
-    for point in points:
-        index = index + 1
-        cell = cells.query([point[0], point[1]])
-        plt.scatter(point[0], point[1])
-        plt.scatter(square_list_centers[cell[1]][0], square_list_centers[cell[1]][1], marker='x')
-        print(cell[1])
-    plt.imshow(image_11)
-    plt.show()
+    chessboard_list = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
 
+    for point in points:
+        cell = cells.query([point[0], point[1]])
+        #plt.scatter(point[0], point[1])
+        #plt.scatter(square_list_centers[cell[1]][0], square_list_centers[cell[1]][1], marker='x')
+        if(len(chessboard_list[cell[1]]) < 1):
+            chessboard_list[cell[1]] = dictPieces[classes[index].item()]
+        index = index + 1
+
+    #plt.imshow(image_11)
+    #plt.show()
+    fen = create_fen(chessboard_list)
+    print(fen)
     return 
 
+def create_fen(chessboard_list):
+
+    arr = np.array(chessboard_list)
+ 
+    chessboard_matrix = arr.reshape(-1, 8)
+
+    print(chessboard_matrix)
+    fen = ""
+
+    for line in range(8):
+        count = 0
+        tempString = ""
+        for cell in range(8): 
+            if(len(chessboard_matrix[line][cell]) < 1):
+                count = count + 1
+            else:
+                if(count > 0):
+                    tempString = tempString + str(count)
+                    count = 0
+                tempString = tempString + chessboard_matrix[line][cell]
+        if(count > 0):
+            tempString = tempString + str(count)
+        
+        fen = fen + tempString
+        if(line < 7):
+            fen = fen + "/"
+        
+    fen = fen + " w KQkq - 0 1"
+    return fen
 
 # Orginal phote taken by the app
 #starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
 # starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0003.jpg"
-starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0007.jpg"
+starting_image_link = "test_images/47237294-c5a012dfa72816098d23fc8baee67834_jpg.rf.e3f72193f30138545bf762265f30083f.jpg"
 
 #detect pieces with otiginal yolo model 
-model_pieces = YOLO("training_output\content\\runs\detect\\train2_200_epocs\weights\\best.pt")
+model_pieces = YOLO("training_output/content/runs/detect/train2_200_epocs/weights/best.pt")
 results_pieces_original = model_pieces.predict(starting_image_link, save=True, iou=0.2, show=False, project="yolo_output_final_warped", name="on_original_perspective", exist_ok=True)
 
 #chessboard corner detection 
