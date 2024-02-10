@@ -145,8 +145,9 @@ def create_fen(chessboard_list):
 
 # Orginal phote taken by the app
 #starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
-# starting_image_link = "test_images\\test_images_real\IMG-20240208-WA0003.jpg"
-starting_image_link = "test_images/47237294-c5a012dfa72816098d23fc8baee67834_jpg.rf.e3f72193f30138545bf762265f30083f.jpg"
+starting_image_link = "test_images/IMG-20240208-WA0003.jpg"
+# starting_image_link = "test_images/47237294-c5a012dfa72816098d23fc8baee67834_jpg.rf.e3f72193f30138545bf762265f30083f.jpg"
+# starting_image_link = "test_images/b9402881fa580d0eb8b9b98845417550_jpg.rf.7c401587706c0c03dab27877a8d22f55.jpg"
 
 #detect pieces with otiginal yolo model 
 model_pieces = YOLO("best_piecies.pt")
@@ -224,7 +225,7 @@ for point in points:
     p = np.float32(np.array([[point]]))
     new_point = cv2.perspectiveTransform(p, M)
     new_point = new_point[0][0]
-    new_point[1] = new_point[1] + 40
+    new_point[1] = new_point[1] + 10
     # print(new_point)
     list_point_detetcts.append(new_point)
 
