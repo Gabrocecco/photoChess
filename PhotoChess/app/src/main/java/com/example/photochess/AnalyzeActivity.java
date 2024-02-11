@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,14 +27,19 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class AnalyzeActivity extends AppCompatActivity {
 
-    ImageView nextMoveBtn;
+    ImageView bestMoveBtn;
     String fen = "";
     PyObject module;
     ImageView boardPhoto;
     View customLayout;
+    AlertDialog.Builder builder;
+    AlertDialog alert;
+    Button nextnextBtn;
+    String svg_array[];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +55,7 @@ public class AnalyzeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         fen = intent.getExtras().getString("fen");
 
-        nextMoveBtn = findViewById(R.id.bmoveBtn);
+        bestMoveBtn = findViewById(R.id.bmoveBtn);
         if (! Python.isStarted()) {
             Python.start(new AndroidPlatform(this));
         }
@@ -60,7 +66,7 @@ public class AnalyzeActivity extends AppCompatActivity {
         boardPhoto = findViewById(R.id.boardView);
         PictureDrawable drawable = getPictureDrawablefromSvg(el.toString());
         boardPhoto.setImageDrawable(drawable);
-        nextMoveBtn.setOnClickListener(new View.OnClickListener() {
+        bestMoveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getBestMove();
@@ -75,7 +81,7 @@ public class AnalyzeActivity extends AppCompatActivity {
             }
         });
 
-        customLayout = getLayoutInflater().inflate(R.layout.edit_dialog, null);
+        customLayout = getLayoutInflater().inflate(R.layout.edit_dialog, null, false);
         Spinner columnSpinner = customLayout.findViewById(R.id.column_spinner);
         Spinner lineSpinner = customLayout.findViewById(R.id.line_spinner);
         Spinner pieceSpinner = customLayout.findViewById(R.id.piece_spinner);
@@ -99,15 +105,25 @@ public class AnalyzeActivity extends AppCompatActivity {
             }
         });
 
+        nextnextBtn = findViewById(R.id.nextMove);
+        nextnextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nextMove();
+            }
+        });
+
     }
 
     public void getBestMove(){
         PyObject response = module.callAttr("getbestmove", fen);
-        PyObject movedSvg = module.callAttr("getmoveboard", fen, response.toString().substring(0,2), response.toString().substring(2,4));
-
-        PictureDrawable drawable = getPictureDrawablefromSvg(movedSvg.toString());
+        svg_array = response.toJava(String[].class);
+        PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
+        svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
 
         boardPhoto.setImageDrawable(drawable);
+        bestMoveBtn.setVisibility(View.INVISIBLE);
+        nextnextBtn.setVisibility(View.VISIBLE);
     }
 
 
@@ -123,7 +139,7 @@ public class AnalyzeActivity extends AppCompatActivity {
         {
             text = text + ";" + column + line + ":" + piece;
         }
-        else{
+        else {
             text = column + line + ":" + piece;
         }
 
@@ -135,6 +151,7 @@ public class AnalyzeActivity extends AppCompatActivity {
         SVG svg = null;
         try {
             svg = SVG.getFromString(svgString);
+            Log.e("SVG", svg.toString());
         } catch (SVGParseException e) {
             throw new RuntimeException(e);
         };
@@ -144,24 +161,51 @@ public class AnalyzeActivity extends AppCompatActivity {
 
     public void editChessboard(){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit chessboard");
+        ViewGroup parentView = (ViewGroup) customLayout.getParent();
+        if (parentView != null) {
+            parentView.removeView(customLayout);
+        }
+        builder = new AlertDialog.Builder(this);
         builder.setView(customLayout);
+        builder.setTitle("Edit chessboard");
         builder.setIcon(R.drawable.blackrook);
+
         builder.setPositiveButton("Confirm edit", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 TextView changesText = customLayout.findViewById(R.id.changesTextBox);
                 String text = changesText.getText().toString();
-                PyObject newFen = module.callAttr("editchessboard", text);
+
+                if(text.length() > 0){
+
+                    PyObject newFen = module.callAttr("getfenfromedits", fen, text);
+                    PyObject newImg = module.callAttr("getboard", newFen.toString());
+                    PictureDrawable drawable = getPictureDrawablefromSvg(newImg.toString());
+                    boardPhoto.setImageDrawable(drawable);
+
+                }
+
             }
         });
 
-        // A null listener allows the button to dismiss the dialog and take no further action.
-        builder.setNegativeButton(android.R.string.no, null);
-        AlertDialog alert = builder.create();
+        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+
+        alert = builder.create();
         alert.show();
         alert.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.mygreen));
         alert.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.mycol));
+    }
+
+    public void nextMove(){
+        if(svg_array.length > 1){
+            PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
+            boardPhoto.setImageDrawable(drawable);
+            svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
+
+        }
     }
 
 }

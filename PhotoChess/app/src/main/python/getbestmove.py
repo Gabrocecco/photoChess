@@ -11,7 +11,32 @@ def getbestmove(fen):
 
     analysis = client.analysis.get_cloud_evaluation(fen, 1)
     dict = analysis["pvs"]
-    return(dict.pop(0)['moves'].split(' ')[0])
+
+    singlemoves = dict[0]["moves"].split(" ")
+    maxnofmoves = 0
+    board = chess.Board(fen)
+    movedSvg = []
+
+    if(len(singlemoves) > 5):
+        maxnofmoves = 5
+    else:
+        maxnofmoves = len(singlemoves)
+
+    for i in range(maxnofmoves):
+        fromString = singlemoves[i][0:2]
+        toString = singlemoves[i][2:4]
+        totalmovesSvg = ""
+
+        if i==0:
+            svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
+        else:
+            move = chess.Move.from_uci(singlemoves[i-1])
+            board.push(move)
+            svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
+        movedSvg.append(str(svg))
+
+    return movedSvg    
+    
 
 def getboard(fen):
     board = chess.Board(fen)
@@ -38,9 +63,11 @@ dictFenPieces = {
         1:'b', 2:'k', 3:'n', 4:'p', 5:'q', 6:'r', 7:'B', 8:'K', 9:'N', 10:'P', 11:'Q', 12:'R'
     }
 
+dictCell = {1:8, 2:7, 3:6, 4:5, 5:4, 6:3, 7:2, 8:1}
 
-movesString = "A4:White Rook;B3:White Queen"
-moves = movesString.split(";")
+
+
+
 
 fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 2"
 
@@ -82,14 +109,43 @@ def getChessboardMatrixfromFen(fen):
     
 
 
-def editchessboardwmoves(chessboard, moves):
+def editchessboardwmoves(chessboard, movesString):
+    moves = movesString.split(";")
     for move in moves:
         parts = move.split(':')
-        print(dictEditPieces[parts[1]])
-        chessboard[int(parts[0][1])][int(dictColumn[parts[0][0]])] = dictEditPieces[parts[1]]
+        if(parts[1] == "Empty"):
+            chessboard[dictCell[int(parts[0][1])]-1][int(dictColumn[parts[0][0]])] = ""
+        else:
+            chessboard[dictCell[int(parts[0][1])]-1][int(dictColumn[parts[0][0]])] = dictEditPieces[parts[1]]
     return chessboard
 
-chessboard = getChessboardMatrixfromFen(fen)
-chessboard = editchessboardwmoves(chessboard, moves)
+def create_fen(chessboard_matrix):
+    fen = ""
 
+    for line in range(8):
+        count = 0
+        tempString = ""
+        for cell in range(8): 
+            if(len(chessboard_matrix[line][cell]) < 1):
+                count = count + 1
+            else:
+                if(count > 0):
+                    tempString = tempString + str(count)
+                    count = 0
+                tempString = tempString + chessboard_matrix[line][cell]
+        if(count > 0):
+            tempString = tempString + str(count)
+        
+        fen = fen + tempString
+        if(line < 7):
+            fen = fen + "/"
+        
+    fen = fen + " w KQkq - 0 1"
+    return fen
+
+def getfenfromedits(fen, moves):
+    chessboard = getChessboardMatrixfromFen(fen)
+    chessboard = editchessboardwmoves(chessboard, moves)
+    newfen = create_fen(chessboard)
+    return newfen
 

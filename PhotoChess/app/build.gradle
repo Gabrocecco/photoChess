@@ -24,6 +24,7 @@ android {
             pip {
                 install "chess==1.10.0"
                 install "berserk"
+                install "numpy"
             }
         }
     }
