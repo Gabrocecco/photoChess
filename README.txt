@@ -1,9 +1,7 @@
-Autors: 
+Authors: 
 Gabriele Ceccolini @Gabrocecco
 Rocco Pastore @roccopastore
 Giacomo Grilli @jackman91798
-
-
 
 ☑ Training of the Object detector model (YOLO) on the reference dataset
 ☑ Localization and classification of the pieces on the board starting from the output of the trained model
