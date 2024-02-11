@@ -1,6 +1,8 @@
 import berserk
 import chess
 import chess.svg
+from PIL import Image
+import io
 
 API_TOKEN = "lip_AogrJ6dUu8ruSPMBZNUW"
 
@@ -48,8 +50,11 @@ def getmoveboard(fen, fromString, toString):
     svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
     return svg
 
-def getfen(bitmapImage, turn):
+def getfen(byteArray, turn):
     #allFunctions
+    image = Image.open(io.BytesIO(byteArray))
+    numpy_array = np.array(image)
+    print(numpy_array.shape)
     return "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R " + turn + " KQkq - 1 2"
 
 import numpy as np
@@ -86,6 +91,7 @@ chessboard_matrix = arr.reshape(-1, 8)
 
 def getChessboardMatrixfromFen(fen):
     singleline = fen.split("/")
+    turn = singleline[7] = singleline[7].split(" ")[1]
     singleline[7] = singleline[7].split(" ")[0]
     formatted_fen = ""
     for line in singleline:
@@ -105,7 +111,7 @@ def getChessboardMatrixfromFen(fen):
             if(line[el]!='e'):
                 chessboard_matrix[index][el] = line[el]
         index = index + 1
-    return chessboard_matrix
+    return chessboard_matrix, turn
     
 
 
@@ -148,4 +154,6 @@ def getfenfromedits(fen, moves):
     chessboard = editchessboardwmoves(chessboard, moves)
     newfen = create_fen(chessboard)
     return newfen
+
+
 

@@ -25,6 +25,10 @@ android {
                 install "chess==1.10.0"
                 install "berserk"
                 install "numpy"
+                install "Pillow"
+                install "ultralytics"
+                install "opencv-python"
+                install "matplotlib"
             }
         }
     }

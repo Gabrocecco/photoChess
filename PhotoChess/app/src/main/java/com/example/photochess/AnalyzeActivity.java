@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
@@ -27,6 +28,7 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Arrays;
 
 public class AnalyzeActivity extends AppCompatActivity {
@@ -60,7 +62,7 @@ public class AnalyzeActivity extends AppCompatActivity {
             Python.start(new AndroidPlatform(this));
         }
         Python py = Python.getInstance();
-        module = py.getModule("getbestmove");
+        module = py.getModule("pipeline");
         PyObject el = module.callAttr("getboard", fen);
 
         boardPhoto = findViewById(R.id.boardView);
@@ -117,13 +119,27 @@ public class AnalyzeActivity extends AppCompatActivity {
 
     public void getBestMove(){
         PyObject response = module.callAttr("getbestmove", fen);
-        svg_array = response.toJava(String[].class);
-        PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
-        svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
+        Log.e("Error", response.toString());
+        //svg_array = response.toJava(String[].class);
+        //PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
+        //svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
 
-        boardPhoto.setImageDrawable(drawable);
-        bestMoveBtn.setVisibility(View.INVISIBLE);
-        nextnextBtn.setVisibility(View.VISIBLE);
+        //boardPhoto.setImageDrawable(drawable);
+        //bestMoveBtn.setVisibility(View.INVISIBLE);
+        //nextnextBtn.setVisibility(View.VISIBLE);
+        /*try {
+            PyObject response = module.callAttr("getbestmove", fen);
+            svg_array = response.toJava(String[].class);
+            PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
+            svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
+
+            boardPhoto.setImageDrawable(drawable);
+            bestMoveBtn.setVisibility(View.INVISIBLE);
+            nextnextBtn.setVisibility(View.VISIBLE);
+        }catch (Exception e){
+            Toast.makeText(this, "Chessboard not valid", Toast.LENGTH_LONG);
+        }*/
+
     }
 
 
@@ -177,8 +193,7 @@ public class AnalyzeActivity extends AppCompatActivity {
 
                 if(text.length() > 0){
 
-                    PyObject newFen = module.callAttr("getfenfromedits", fen, text);
-                    PyObject newImg = module.callAttr("getboard", newFen.toString());
+                    PyObject newImg = module.callAttr("getfenfromedits", fen, text);
                     PictureDrawable drawable = getPictureDrawablefromSvg(newImg.toString());
                     boardPhoto.setImageDrawable(drawable);
 

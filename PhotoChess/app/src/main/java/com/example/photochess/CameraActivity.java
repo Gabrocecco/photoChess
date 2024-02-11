@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +31,7 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,7 +84,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             Python.start(new AndroidPlatform(this));
         }
         Python py = Python.getInstance();
-        module = py.getModule("getbestmove");
+        module = py.getModule("pipeline");
 
         provider = ProcessCameraProvider.getInstance(this);
         provider.addListener( () ->
@@ -214,7 +216,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
         Bitmap image = previewView.getBitmap();
         String[] choices = {"WHITE","BLACK"};
-
+        Bitmap test = BitmapFactory.decodeResource(getResources(), R.drawable.testimage);
 
 
         int currentChoice = 0;
@@ -234,7 +236,11 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                         Log.e("turn", turn);
                         //call python function to obtain the fen
 
-                        PyObject fenPy = module.callAttr("getfen", image, turn);
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        test.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        byte[] byteImage  = stream.toByteArray();
+                        Log.e("ByteImage", byteImage.toString());
+                        PyObject fenPy = module.callAttr("main", byteImage, turn);
                         Intent i = new Intent(CameraActivity.this, AnalyzeActivity.class);
                         i.putExtra("fen", fenPy.toString());
                         startActivity(i);
