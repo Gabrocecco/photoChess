@@ -31,9 +31,6 @@ def plot_grid_on_transformed_image(image):
     corners = order_points(corners)
 
     figure(figsize=(10, 10), dpi=80)
-
-    # im = plt.imread(image)
-    implot = plt.imshow(image)
     
     TL = corners[0]
     BL = corners[3]
@@ -50,23 +47,23 @@ def plot_grid_on_transformed_image(image):
 
     ptsT = interpolate( TL, TR )
     ptsL = interpolate( TL, BL )
-    ptsR = interpolate( TR, BR )
-    ptsB = interpolate( BL, BR )
+    # ptsR = interpolate( TR, BR )
+    # ptsB = interpolate( BL, BR )
         
-    for a,b in zip(ptsL, ptsR):
-        plt.plot( [a[0], b[0]], [a[1], b[1]], 'ro', linestyle="--" )
-    for a,b in zip(ptsT, ptsB):
-        plt.plot( [a[0], b[0]], [a[1], b[1]], 'ro', linestyle="--" )
+    # for a,b in zip(ptsL, ptsR):
+    #     plt.plot( [a[0], b[0]], [a[1], b[1]], 'ro', linestyle="--" )
+    # for a,b in zip(ptsT, ptsB):
+    #     plt.plot( [a[0], b[0]], [a[1], b[1]], 'ro', linestyle="--" )
         
-    plt.axis('off')
+    # plt.axis('off')
 
-    plt.savefig('chessboard_transformed_with_grid.jpg')
+    # plt.savefig('chessboard_transformed_with_grid.jpg')
     return ptsT, ptsL
 
 
 # connects detected piece to the right square
 
-def connect_square_to_detection(points, ptsT, ptsL, classes):
+def connect_square_to_detection(points, ptsT, ptsL, classes, turn):
     
     square_list_centers = []
     #for l in range(0,len(ptsL)-1):
@@ -104,17 +101,17 @@ def connect_square_to_detection(points, ptsT, ptsL, classes):
 
     # plt.imshow(img)
     # plt.show()
-    fen = create_fen(chessboard_list)
+    fen = create_fen(chessboard_list, turn)
     # print(fen)
     return fen
 
-def create_fen(chessboard_list):
+def create_fen(chessboard_list, turn):
 
     arr = np.array(chessboard_list)
  
     chessboard_matrix = arr.reshape(-1, 8)
 
-    print(chessboard_matrix)
+    # print(chessboard_matrix)
     fen = ""
 
     for line in range(8):
@@ -135,5 +132,6 @@ def create_fen(chessboard_list):
         if(line < 7):
             fen = fen + "/"
         
-    fen = fen + " w KQkq - 0 1"
+    fen = fen + " "+ turn + " KQkq - 0 1"
+    
     return fen
