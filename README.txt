@@ -1,7 +1,8 @@
 Autors: 
-@Gabrocecco
-@jackman91798
-@roccopastore
+Gabriele Ceccolini @Gabrocecco
+Rocco Pastore @roccopastore
+Giacomo Grilli @jackman91798
+
 
 
 ☑ Training of the Object detector model (YOLO) on the reference dataset
