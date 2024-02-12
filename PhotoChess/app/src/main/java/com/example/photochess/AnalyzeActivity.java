@@ -5,9 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.PictureDrawable;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,8 +25,6 @@ import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
-import java.io.File;
-import java.time.Duration;
 import java.util.Arrays;
 
 public class AnalyzeActivity extends AppCompatActivity {
@@ -40,8 +36,11 @@ public class AnalyzeActivity extends AppCompatActivity {
     View customLayout;
     AlertDialog.Builder builder;
     AlertDialog alert;
-    Button nextnextBtn;
+    ImageView nextMoveBtn;
     String svg_array[];
+    ImageView analyzeBtn;
+
+    View analyzeLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,26 +106,40 @@ public class AnalyzeActivity extends AppCompatActivity {
             }
         });
 
-        nextnextBtn = findViewById(R.id.nextMove);
-        nextnextBtn.setOnClickListener(new View.OnClickListener() {
+        nextMoveBtn = findViewById(R.id.nextBtn);
+        nextMoveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 nextMove();
             }
         });
 
+        analyzeBtn = findViewById(R.id.amatchBtn);
+        analyzeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                analyzeMatch();
+            }
+        });
+        analyzeLayout = getLayoutInflater().inflate(R.layout.analyze_dialog, null, false);
+
     }
 
     public void getBestMove(){
         PyObject response = module.callAttr("getbestmove", fen);
-        Log.e("Error", response.toString());
-        //svg_array = response.toJava(String[].class);
-        //PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
-        //svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
+        Log.e("Response", response.toString());
+        if(!response.toString().equals("Error")){
+            svg_array = response.toJava(String[].class);
+            PictureDrawable drawable = getPictureDrawablefromSvg(svg_array[0].toString());
+            svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
 
-        //boardPhoto.setImageDrawable(drawable);
-        //bestMoveBtn.setVisibility(View.INVISIBLE);
-        //nextnextBtn.setVisibility(View.VISIBLE);
+            boardPhoto.setImageDrawable(drawable);
+            bestMoveBtn.setVisibility(View.INVISIBLE);
+            nextMoveBtn.setVisibility(View.VISIBLE);
+        }
+        else{
+            Toast.makeText(this, "Invalid chessboard", Toast.LENGTH_LONG).show();
+        }
         /*try {
             PyObject response = module.callAttr("getbestmove", fen);
             svg_array = response.toJava(String[].class);
@@ -193,11 +206,17 @@ public class AnalyzeActivity extends AppCompatActivity {
 
                 if(text.length() > 0){
 
-                    PyObject newImg = module.callAttr("getfenfromedits", fen, text);
+                    PyObject newfen = module.callAttr("getfenfromedits", fen, text);
+                    fen = newfen.toString();
+                    PyObject newImg = module.callAttr("getboard", fen);
                     PictureDrawable drawable = getPictureDrawablefromSvg(newImg.toString());
                     boardPhoto.setImageDrawable(drawable);
+                    changesText.setText("");
 
                 }
+
+                nextMoveBtn.setVisibility(View.INVISIBLE);
+                bestMoveBtn.setVisibility(View.VISIBLE);
 
             }
         });
@@ -221,6 +240,42 @@ public class AnalyzeActivity extends AppCompatActivity {
             svg_array = Arrays.copyOfRange(svg_array, 1, svg_array.length);
 
         }
+    }
+
+    public void analyzeMatch(){
+
+        Log.e("Clicco", "AnalyzeMatch");
+        TextView numscore = analyzeLayout.findViewById(R.id.evalScore);
+        TextView textscore = analyzeLayout.findViewById(R.id.vartextScore);
+
+        PyObject res = module.callAttr("geteval", fen);
+        if(res.toString().equals("Error"))
+        {
+            Toast.makeText(this,"Invalid chessboard", Toast.LENGTH_LONG).show();
+        }
+        else if(res.toString().substring(0,1).equals('-')){
+            textscore.setText("WHITE");
+            numscore.setText(res.toString());
+        }
+        else{
+            textscore.setText("BLACK");
+            numscore.setText(res.toString());
+        }
+        ViewGroup parentView = (ViewGroup) analyzeLayout.getParent();
+        if (parentView != null) {
+            parentView.removeView(analyzeLayout);
+        }
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+        builder2.setView(analyzeLayout);
+        builder2.setTitle("Match Analysis");
+        builder2.setIcon(R.drawable.blackrook);
+        builder2.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }});
+        AlertDialog alert2 = builder2.create();
+        alert2.show();
+        alert2.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.mygreen));
+
     }
 
 }

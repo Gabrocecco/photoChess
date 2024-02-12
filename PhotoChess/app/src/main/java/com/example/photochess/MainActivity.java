@@ -28,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(getColor(R.color.mycol));
         }
 
+        if (! Python.isStarted()) {
+            Python.start(new AndroidPlatform(this));
+        }
+
         ImageView btn = (ImageView) findViewById(R.id.photoButton);
 
         btn.setOnClickListener(new View.OnClickListener() {

@@ -173,7 +173,7 @@ def editchessboardwmoves(chessboard, movesString):
 
 def getChessboardMatrixfromFen(fen):
     singleline = fen.split("/")
-    turn = singleline[7] = singleline[7].split(" ")[1]
+    turn = singleline[7].split(" ")[1]
     singleline[7] = singleline[7].split(" ")[0]
     formatted_fen = ""
     for line in singleline:

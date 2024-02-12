@@ -10,6 +10,9 @@ from os.path import dirname, join
 import berserk
 import chess
 import chess.svg
+import requests
+import chess.engine
+import json
 from utils import order_points, plot_grid_on_transformed_image, connect_square_to_detection, create_fen, editchessboardwmoves, getChessboardMatrixfromFen
 
 API_TOKEN = "lip_AogrJ6dUu8ruSPMBZNUW"
@@ -148,48 +151,66 @@ def getfenfromedits(fen, moves):
     chessboard, turn = getChessboardMatrixfromFen(fen)
     chessboard = editchessboardwmoves(chessboard, moves)
     newfen = create_fen(chessboard, turn)
-    board = getboard(newfen)
-    return board
+    return newfen
 
 
 def getbestmove(fen):
 
-    session = berserk.TokenSession(API_TOKEN)
-    client = berserk.Client(session=session)
+    #session = berserk.TokenSession(API_TOKEN)
+    #client = berserk.Client(session=session)
 
-    analysis = client.analysis.get_cloud_evaluation(fen, 1)
-    dict = analysis["pvs"]
+    #analysis = client.analysis.get_cloud_evaluation(fen, 1)
+    #dict = analysis["pvs"]
 
-    singlemoves = dict[0]["moves"].split(" ")
-    maxnofmoves = 0
+    print(fen)
+
+    url = 'https://stockfish.online/api/stockfish.php?fen='+fen+'&depth=10&mode=lines'
+
+    x = requests.post(url)
+
+
     board = chess.Board(fen)
+
+    response = json.loads(x.text)
+    singlemoves = response["data"].split(" ")
+    maxnofmoves = 0
     movedSvg = []
 
-    if(len(singlemoves) > 5):
-        maxnofmoves = 5
+    maxnofmoves = len(singlemoves)
+
+    if(response["success"] == True and len(response["data"]) > 1): 
+
+        for i in range(maxnofmoves):
+            fromString = singlemoves[i][0:2]
+            toString = singlemoves[i][2:4]
+            totalmovesSvg = ""
+            if i==0:
+                svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
+            else:
+                move = chess.Move.from_uci(singlemoves[i-1])
+                board.push(move)
+                svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
+            movedSvg.append(str(svg))
+
+        return movedSvg   
+
     else:
-        maxnofmoves = len(singlemoves)
-
-    for i in range(maxnofmoves):
-        fromString = singlemoves[i][0:2]
-        toString = singlemoves[i][2:4]
-        totalmovesSvg = ""
-
-        if i==0:
-            svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
-        else:
-            move = chess.Move.from_uci(singlemoves[i-1])
-            board.push(move)
-            svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"}, arrows=[chess.svg.Arrow(getattr(chess, fromString.capitalize()), getattr(chess, toString.capitalize()), color="#77FF61")])
-        movedSvg.append(str(svg))
-
-    return movedSvg   
+        return "Error"
 
 def getboard(fen):
     board = chess.Board(fen)
     svg = chess.svg.board(board, colors={"square dark" : "#6A6F7A", "square light" : "#D5DEF5", "outer border" : "#15781B80"})
     return svg
 
+def geteval(fen):
 
+    url = 'https://stockfish.online/api/stockfish.php?fen='+fen+'&depth=10&mode=eval'
+    x = requests.post(url)
+    response = json.loads(x.text)
+    
+    if (response["success"] == True and len(response["data"]) > 1): 
+        return response["data"].split(" ")[2]
+    else:
+        return "Error"
 
 
