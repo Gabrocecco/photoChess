@@ -10,11 +10,22 @@
     <ImageView
         android:id="@+id/photoButton"
         android:layout_width="305dp"
-        android:layout_height="440dp"
+        android:layout_height="100dp"
         android:src="@drawable/catchbutton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.752" />
+        app:layout_constraintVertical_bias="0.685" />
+
+    <ImageView
+        android:id="@+id/howButton"
+        android:layout_width="305dp"
+        android:layout_height="100dp"
+        android:src="@drawable/howbutton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.821" />
 </androidx.constraintlayout.widget.ConstraintLayout>
