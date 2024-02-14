@@ -1,4 +1,4 @@
-##PhotoChess
+## PhotoChess
 ![app](https://github.com/Gabrocecco/photoChess/blob/main/app.png)
 
 Authors: 
