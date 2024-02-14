@@ -1,4 +1,4 @@
-![App](https://https://github.com/Gabrocecco/photoChess/blob/main/app.jpg?raw=true)
+![App](https://github.com/Gabrocecco/photoChess/blob/main/app.jpg?raw=true)
 
 
 Authors: 
