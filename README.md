@@ -1,4 +1,4 @@
-## PhotoChess
+# PhotoChess
 ![app](https://github.com/Gabrocecco/photoChess/blob/main/app.png)
 
 Authors: 
@@ -10,13 +10,13 @@ Authors:
 [Giacomo Grilli @jackman91798](https://github.com/jackman91798)
 
 
-# ☑ Training of the Object detector model (YOLO) on the reference dataset
+### ☑ Training of the Object detector model (YOLO) on the reference dataset
 
-# ☑ Localization and classification of the pieces on the board starting from the output of the trained model
+### ☑ Localization and classification of the pieces on the board starting from the output of the trained model
 
-# ☑ Porting the position into a digital representation of the board
+### ☑ Porting the position into a digital representation of the board
 
-# ☑ Integration on Android application for position analysis via chess engine via external API
+### ☑ Integration on Android application for position analysis via chess engine via external API
 
 
 
