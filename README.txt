@@ -1,4 +1,5 @@
-!(https://github.com/Gabrocecco/photoChess/blob/main/app.jpg)
+![App](https://https://github.com/Gabrocecco/photoChess/blob/main/app.jpg?raw=true)
+
 
 Authors: 
 Gabriele Ceccolini @Gabrocecco
