@@ -1,4 +1,4 @@
-![alt text](https://github.com/Gabrocecco/photoChess/blob/main/app.jpg)
+!(https://github.com/Gabrocecco/photoChess/blob/main/app.jpg)
 
 Authors: 
 Gabriele Ceccolini @Gabrocecco
