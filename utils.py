@@ -111,7 +111,7 @@ def create_fen(chessboard_list, turn):
  
     chessboard_matrix = arr.reshape(-1, 8)
 
-    # print(chessboard_matrix)
+    print(chessboard_matrix)
     fen = ""
 
     for line in range(8):

@@ -5,14 +5,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utils import order_points, plot_grid_on_transformed_image, connect_square_to_detection
 
-
-def main(array_image, turn):
+def main(starting_image_link, turn):
     # Orginal phote taken by the app
     #starting_image_link = "dataset\\train\images\\04aed88a8d23cf27e47806eb23948495_jpg.rf.b2b9c08d458461669627c4976b744f46.jpg"
     # starting_image_link = "test_images/IMG-20240208-WA0003.jpg"
     # starting_image_link = "test_images/47237294-c5a012dfa72816098d23fc8baee67834_jpg.rf.e3f72193f30138545bf762265f30083f.jpg"
     # starting_image_link = "test_images/b9402881fa580d0eb8b9b98845417550_jpg.rf.7c401587706c0c03dab27877a8d22f55.jpg"
-    starting_image_link = "test_images/3a995397-685b860d412b91f5d4f7f9e643b84452_jpg.rf.5ba8dc0b5d2585d01b28089debd42cd6.jpg"
+    # starting_image_link = "test_images/3a995397-685b860d412b91f5d4f7f9e643b84452_jpg.rf.5ba8dc0b5d2585d01b28089debd42cd6.jpg"
     # starting_image_link = "test_images/553dbf7c-f1a24b6bb778ee11ba33687415aa84f2_jpg.rf.6e35192bbbb13f887540067e07d5d660.jpg"
 
     img_PIL = Image.open(starting_image_link)
@@ -133,4 +132,6 @@ def main(array_image, turn):
     return fen
 
 
+starting_image_link = "yolo_output_final_warped\on_original_perspective/3a995397-685b860d412b91f5d4f7f9e643b84452_jpg.rf.5ba8dc0b5d2585d01b28089debd42cd6.jpg"
+main(starting_image_link, "w")
 
