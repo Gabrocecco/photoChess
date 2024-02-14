@@ -1,3 +1,5 @@
+![alt text](https://github.com/Gabrocecco/photoChess/blob/main/app.jpg)
+
 Authors: 
 Gabriele Ceccolini @Gabrocecco
 Rocco Pastore @roccopastore
