@@ -76,10 +76,10 @@ Desktop pipeline — install the pinned environment from [requirements.lock](req
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install --index-url https://download.pytorch.org/whl/cpu -r requirements.lock
+pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.lock
 ```
 
-`torch`/`torchvision` must come from that same PyTorch index — installing torchvision from default PyPI against a CPU-only torch build fails at import with `operator torchvision::nms does not exist`. The lock was pinned on Python 3.14 (the only interpreter available at the time); Chaquopy resolves the same package names independently against its own Android wheel index, so this lock does not guarantee identical behavior on-device — see the comment header in the file.
+Use `--extra-index-url`, not `--index-url` — the latter replaces the default PyPI index instead of adding to it, and `download.pytorch.org` doesn't mirror the rest of PyPI (unrelated packages like `certifi` fail to resolve at all). `torch`/`torchvision` still specifically need that index — installing torchvision from default PyPI against a CPU-only torch build fails at import with `operator torchvision::nms does not exist`. The lock was pinned on Python 3.14 (the only interpreter available at the time); Chaquopy resolves the same package names independently against its own Android wheel index, so this lock does not guarantee identical behavior on-device — see the comment header in the file and the Fase 3/4 notes above for the confirmed real differences (`torch==1.8.1` vs `2.13.0`, etc).
 
 Training is not done in this repo — it runs in Colab via [yoloTrainingColab.ipynb](yoloTrainingColab.ipynb) (`yolo train model=yolov8n.pt data=.../data.yaml epochs=200 imgsz=640`) against a Drive-mounted dataset; results were downloaded into `training_output/` and the chosen weights promoted to `best_corners.pt` / `best_piecies.pt`.
 

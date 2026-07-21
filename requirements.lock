@@ -1,5 +1,6 @@
 # Pinned Python environment for the desktop/research pipeline (repo-root
-# pipeline.py + utils.py) and for regenerating tests/golden/fens.json.
+# photochess/ package + pipeline.py CLI) and for regenerating
+# tests/golden/fens.json.
 #
 # Generated 2026-07-21 on Python 3.14.4 (the only interpreter available on
 # the machine this was pinned on; no pyenv/uv/conda was present to get 3.11
@@ -9,10 +10,15 @@
 #
 # Install with:
 #   python3 -m venv .venv && source .venv/bin/activate
-#   pip install --index-url https://download.pytorch.org/whl/cpu -r requirements.lock
-# torch/torchvision MUST come from the same index (the default PyPI
-# torchvision wheel does not match a CPU-only torch build and fails at
-# import time with "operator torchvision::nms does not exist").
+#   pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.lock
+# Use --extra-index-url, not --index-url: the latter replaces the default
+# PyPI index entirely rather than adding to it, and download.pytorch.org
+# doesn't mirror the rest of PyPI (packages like certifi fail to resolve at
+# all) — confirmed the hard way after this file shipped with --index-url
+# for a while uncaught, since nothing had re-run this exact command since.
+# torch/torchvision MUST still come from that index specifically (the
+# default PyPI torchvision wheel does not match a CPU-only torch build and
+# fails at import time with "operator torchvision::nms does not exist").
 #
 # NOT the same as what ships on Android: Chaquopy (see
 # "Android App/PhotoChess/app/build.gradle") resolves these package names
