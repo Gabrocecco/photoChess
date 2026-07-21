@@ -1,13 +1,12 @@
-"""Characterization tests for order_points: pin current behavior so the
-refactor (Fase 2, extracting a pure geometry module) can be verified against
-it. Not a judgment on correctness — see CLAUDE.md for the TL/TR/BR/BL
-ordering convention this function assumes.
+"""Characterization tests for photochess.geometry.order_points and
+grid_points. See CLAUDE.md for the TL/TR/BR/BL ordering convention.
 """
 import numpy as np
-import pytest
+
+from photochess import geometry
 
 
-def test_order_points_axis_aligned_square(utils_root):
+def test_order_points_axis_aligned_square():
     # A simple, unambiguous square: sum-of-coords and diff-of-coords each
     # pick a distinct corner.
     pts = np.array([
@@ -17,7 +16,7 @@ def test_order_points_axis_aligned_square(utils_root):
         [10, 110],  # bottom-left (max diff: x - y)
     ], dtype="float32")
 
-    ordered = utils_root.order_points(pts)
+    ordered = geometry.order_points(pts)
 
     np.testing.assert_array_equal(ordered[0], [10, 10])
     np.testing.assert_array_equal(ordered[1], [110, 10])
@@ -25,7 +24,7 @@ def test_order_points_axis_aligned_square(utils_root):
     np.testing.assert_array_equal(ordered[3], [10, 110])
 
 
-def test_order_points_is_permutation_invariant(utils_root):
+def test_order_points_is_permutation_invariant():
     pts = np.array([
         [110, 110],
         [10, 10],
@@ -33,7 +32,7 @@ def test_order_points_is_permutation_invariant(utils_root):
         [110, 10],
     ], dtype="float32")
 
-    ordered = utils_root.order_points(pts)
+    ordered = geometry.order_points(pts)
 
     np.testing.assert_array_equal(ordered[0], [10, 10])
     np.testing.assert_array_equal(ordered[1], [110, 10])
@@ -41,9 +40,9 @@ def test_order_points_is_permutation_invariant(utils_root):
     np.testing.assert_array_equal(ordered[3], [10, 110])
 
 
-def test_order_points_root_and_android_agree(utils_root, utils_android):
-    # Both copies of order_points must produce byte-identical output for the
-    # refactor to be safe to consolidate into one module (Fase 2).
+def test_order_points_matches_android_copy(utils_android):
+    # photochess.geometry.order_points must stay byte-identical to the
+    # still-shipping Android copy until Fase 3 wires Android to photochess/.
     pts = np.array([
         [87.0, 12.0],
         [412.0, 30.0],
@@ -51,17 +50,14 @@ def test_order_points_root_and_android_agree(utils_root, utils_android):
         [70.0, 388.0],
     ], dtype="float32")
 
-    root_result = utils_root.order_points(pts.copy())
+    new_result = geometry.order_points(pts.copy())
     android_result = utils_android.order_points(pts.copy())
 
-    np.testing.assert_array_equal(root_result, android_result)
+    np.testing.assert_array_equal(new_result, android_result)
 
 
-def test_plot_grid_on_transformed_image_ptsT_ptsL_endpoints(utils_root):
-    class FakeImage:
-        size = (800, 400)  # (width, height)
-
-    ptsT, ptsL = utils_root.plot_grid_on_transformed_image(FakeImage())
+def test_grid_points_endpoints():
+    ptsT, ptsL = geometry.grid_points(800, 400)
 
     assert len(ptsT) == 9
     assert len(ptsL) == 9
@@ -71,3 +67,27 @@ def test_plot_grid_on_transformed_image_ptsT_ptsL_endpoints(utils_root):
     # left edge runs top-to-bottom along x=0
     assert ptsL[0] == (0.0, 0.0)
     assert ptsL[-1] == (0.0, 400.0)
+
+
+def test_grid_points_matches_android_copy(utils_android):
+    class FakeImage:
+        size = (800, 400)
+
+    expected_ptsT, expected_ptsL = utils_android.plot_grid_on_transformed_image(FakeImage())
+    ptsT, ptsL = geometry.grid_points(800, 400)
+
+    assert ptsT == expected_ptsT
+    assert ptsL == expected_ptsL
+
+
+def test_compute_homography_axis_aligned_square():
+    corners = np.array([[0, 0], [100, 0], [100, 100], [0, 100]], dtype="float32")
+
+    M, max_width, max_height = geometry.compute_homography(corners)
+
+    assert max_width == 100
+    assert max_height == 100
+    # dst is (maxWidth - 1) x (maxHeight - 1), so an axis-aligned square maps
+    # to a uniform 0.99 scale with no rotation/shear/translation.
+    expected = np.array([[0.99, 0, 0], [0, 0.99, 0], [0, 0, 1]])
+    np.testing.assert_allclose(M, expected, atol=1e-5)

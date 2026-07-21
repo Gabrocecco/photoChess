@@ -1,185 +1,113 @@
 {
   "test_images/021da074-749e9074a77f8d34d86e2218f26cdab4_jpg.rf.8079f8abd9f24ec16e76fcbf18489f46.jpg": {
-    "fen": "8/8/8/8/8/8/8/N7 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 1
+    "fen": "8/8/8/8/8/8/8/N7 w KQkq - 0 1"
   },
   "test_images/062646cb-e0d38d159ad3a801d0304d7e275812cc_jpg.rf.fa0bb8160816a373df824349a24a11e7.jpg": {
-    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 0
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/1af46155-e4583d082076b2b549b3736ad1b193c9_jpg.rf.be7ed36bb2bee36cf4edad46fdd4ec75.jpg": {
-    "fen": "7r/2p3k1/3q1p1R/3p4/3Pn3/1P6/P3K1P1/2R5 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 14
+    "fen": "7r/2p3k1/3q1p1R/3p4/3Pn3/1P6/P3K1P1/2R5 w KQkq - 0 1"
   },
   "test_images/25086f04-410993714e325a1de3e394ffe860df3a_jpg.rf.519bf0fdbd5e38cd44cae1cfebc98536.jpg": {
-    "fen": "r2k1r2/b2p3p/1p1n1pb1/2p1q1p1/P1P5/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 27
+    "fen": "r2k1r2/b2p3p/1p1n1pb1/2p1q1p1/P1P5/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1"
   },
   "test_images/269c7a67-fdcd6ada676799da8a870f58fdf548db_jpg.rf.54abced68347da874d25c5d3886d3c4a.jpg": {
-    "fen": "3k1r2/3p3p/rb1n1pb1/1pp1q1p1/P1P5/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 27
+    "fen": "3k1r2/3p3p/rb1n1pb1/1pp1q1p1/P1P5/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1"
   },
   "test_images/28d8871f-b9402881fa580d0eb8b9b98845417550_jpg.rf.087d716cdfdd9cf2cb65b437af716d4d.jpg": {
-    "fen": "3kr3/3p3p/rb1n1p2/1pp3p1/P1Pq3n/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 27
+    "fen": "3kr3/3p3p/rb1n1p2/1pp3p1/P1Pq3n/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1"
   },
   "test_images/30ae4ede-IMG_0159_JPG.rf.1cf4f243b5072d63e492711720df35f7.jpg": {
-    "fen": "8/8/8/8/8/8/8/N1prpb1P w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 32
+    "fen": "8/8/8/8/8/8/8/N1prpb1P w KQkq - 0 1"
   },
   "test_images/3a995397-685b860d412b91f5d4f7f9e643b84452_jpg.rf.5ba8dc0b5d2585d01b28089debd42cd6.jpg": {
-    "fen": "8/8/3q1k2/1r1p4/3P4/4K3/6P1/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 7
+    "fen": "8/8/3q1k2/1r1p4/3P4/4K3/6P1/8 w KQkq - 0 1"
   },
   "test_images/3ed960e8-d7887071e972604ddf5940d8eb2702e7_jpg.rf.9e1760bfa031e0f1b9ec48b6c0448994.jpg": {
-    "fen": "3k4/3p4/5p2/6p1/1R1bB1N1/1Q3P2/rP1P2n1/3K4 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 15
+    "fen": "3k4/3p4/5p2/6p1/1R1bB1N1/1Q3P2/rP1P2n1/3K4 w KQkq - 0 1"
   },
   "test_images/47237294-c5a012dfa72816098d23fc8baee67834_jpg.rf.e3f72193f30138545bf762265f30083f.jpg": {
-    "fen": "8/8/8/6B1/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 1
+    "fen": "8/8/8/6B1/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/4badb01b-2f6fb003bb89cd401322a535acb42f65_jpg.rf.91ad9df05bd1f86bab67c8368ae5e4ad.jpg": {
-    "fen": "r2k3r/b2p3p/1p1n1pn1/p1p1q1p1/P1P2P1P/3Npb1R/1PQPP1P1/RB2KNB1 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 32
+    "fen": "r2k3r/b2p3p/1p1n1pn1/p1p1q1p1/P1P2P1P/3Npb1R/1PQPP1P1/RB2KNB1 w KQkq - 0 1"
   },
   "test_images/553dbf7c-f1a24b6bb778ee11ba33687415aa84f2_jpg.rf.6e35192bbbb13f887540067e07d5d660.jpg": {
-    "fen": "3k4/3p4/5p2/6p1/3RB1N1/1Q3P2/rP1P2n1/3K4 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 14
+    "fen": "3k4/3p4/5p2/6p1/3RB1N1/1Q3P2/rP1P2n1/3K4 w KQkq - 0 1"
   },
   "test_images/63cb505d-cfc306bf86176b92ffc1afbb98d7896f_jpg.rf.a3779da7c72dfa583f9fffa23c231beb.jpg": {
-    "fen": "3k4/5p2/2b5/4b1p1/2B5/5P2/8/4K3 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 8
+    "fen": "3k4/5p2/2b5/4b1p1/2B5/5P2/8/4K3 w KQkq - 0 1"
   },
   "test_images/6a9ff027-7a34d8620235048917b28bcfd3b5572b_jpg.rf.71653deb6fe88ad472dabea12353373d.jpg": {
-    "fen": "8/8/8/8/5r2/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 1
+    "fen": "8/8/8/8/5r2/8/8/8 w KQkq - 0 1"
   },
   "test_images/8a045902-IMG_0169_JPG.rf.b1530b71278953ad465d06863135c71e.jpg": {
-    "fen": "r1bqk2r/ppp1ppb1/1n4pp/3p4/1P1Pn2P/2N5/P1P1PPPR/R1BQKBN1 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 33
+    "fen": "r1bqk2r/ppp1ppb1/1n4pp/3p4/1P1Pn2P/2N5/P1P1PPPR/R1BQKBN1 w KQkq - 0 1"
   },
   "test_images/8f887132-b526b661a33ff481231d1342aff2a266_jpg.rf.b63c85ea45c4e3a665915fddee8c76f9.jpg": {
-    "fen": "3k4/3p3p/rb3p2/3r2p1/1pn5/1Q2BP2/1P1PP1nN/RB1K4 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 21
+    "fen": "3k4/3p3p/rb3p2/3r2p1/1pn5/1Q2BP2/1P1PP1nN/RB1K4 w KQkq - 0 1"
   },
   "test_images/9e616b77-8ff752f9ed443e6e49d495abfceb2032_jpg.rf.c3e91277eea99c26328e39a6f0285189.jpg": {
-    "fen": "r2k1n1r/b2pq2p/1p1n1p2/p1p3p1/P1P2P1P/3Npb1R/1PQPP1P1/RB2KNB1 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 32
+    "fen": "r2k1n1r/b2pq2p/1p1n1p2/p1p3p1/P1P2P1P/3Npb1R/1PQPP1P1/RB2KNB1 w KQkq - 0 1"
   },
   "test_images/IMG-20240208-WA0003.jpg": {
-    "fen": "2k5/3p4/1b2pk2/2r5/2P5/1P2N3/2KK1R2/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 13
+    "fen": "2k5/3p4/1b2pk2/2r5/2P5/1P2N3/2KK1R2/8 w KQkq - 0 1"
   },
   "test_images/b9402881fa580d0eb8b9b98845417550_jpg.rf.7c401587706c0c03dab27877a8d22f55.jpg": {
-    "fen": "3kr3/3p3p/rb1n1p2/1pp3p1/P1Pq3n/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 27
+    "fen": "3kr3/3p3p/rb1n1p2/1pp3p1/P1Pq3n/1Q1NBb2/1P1PP1PN/RB2K3 w KQkq - 0 1"
   },
   "test_images/empty.jpg": {
-    "fen": "q4r2/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 2
+    "fen": "q4r2/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/empty_top_view.jpg": {
-    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 0
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/endgame_rocks_pawn.jpg": {
-    "fen": "q2k4/K5R1/1k6/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 6
+    "fen": "q2k4/K5R1/1k6/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test.jpg": {
-    "fen": "5n2/8/8/2p5/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 2
+    "fen": "5n2/8/8/2p5/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_chessboard.jpg": {
-    "fen": "8/8/8/8/6P1/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 1
+    "fen": "8/8/8/8/6P1/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_con_pezzi.jpg": {
-    "fen": "8/8/2k5/5q2/1p4k1/2p1p3/3p4/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 8
+    "fen": "8/8/2k5/5q2/1p4k1/2p1p3/3p4/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0002.jpg": {
-    "fen": "2k5/8/1b2q3/2b5/8/1P2R3/2RK4/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 9
+    "fen": "2k5/8/1b2q3/2b5/8/1P2R3/2RK4/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0003.jpg": {
-    "fen": "2k5/3p4/1b2pk2/2r5/2P5/1P2N3/2KK1R2/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 13
+    "fen": "2k5/3p4/1b2pk2/2r5/2P5/1P2N3/2KK1R2/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0004.jpg": {
-    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 0
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0005.jpg": {
-    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 0
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0006.jpg": {
-    "fen": "8/8/8/8/8/8/8/4r3 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 1
+    "fen": "8/8/8/8/8/8/8/4r3 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0007.jpg": {
-    "fen": "N7/2R2K2/3N2P1/5P2/5r2/3b2k1/4p3/5n2 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 13
+    "fen": "N7/2R2K2/3N2P1/5P2/5r2/3b2k1/4p3/5n2 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0008.jpg": {
-    "fen": "8/8/8/8/8/8/8/7N w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 1
+    "fen": "8/8/8/8/8/8/8/7N w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0009.jpg": {
-    "error": "degenerate warp size"
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0010.jpg": {
-    "fen": "8/2P2k2/1B2k2k/1N6/2B5/1R3k2/8/r7 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 11
+    "fen": "8/2P2k2/1B2k2k/1N6/2B5/1R3k2/8/r7 w KQkq - 0 1"
   },
   "test_images/test_images_real/IMG-20240208-WA0011.jpg": {
-    "fen": "Kk6/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 8
+    "fen": "Kk6/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_images_real/master_chessbord.jpg": {
-    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 0
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   },
   "test_images/test_v.jpg": {
-    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1",
-    "num_corners_detected": 4,
-    "num_pieces_detected": 0
+    "fen": "8/8/8/8/8/8/8/8 w KQkq - 0 1"
   }
 }

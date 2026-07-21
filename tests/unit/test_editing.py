@@ -1,20 +1,21 @@
-"""Characterization tests for the Android utils.py board-editing functions:
-getChessboardMatrixfromFen and editchessboardwmoves.
+"""Characterization tests for photochess.fen.board_matrix_from_fen and
+edit_chessboard (ported from the Android-only utils.py; the desktop copy
+never had these).
 
 Includes a deliberate test of the module-level state leak documented in
-CLAUDE.md ("Known rough edges"): getChessboardMatrixfromFen mutates a single
-shared `chessboard_matrix` global in place and only overwrites cells with a
-piece, so cells that go from occupied to empty between two calls keep their
-stale value. This is pinned as CURRENT behavior, not correct behavior — a
-future fix (Fase 5 of the refactor plan) should flip this test rather than
-silently changing behavior mid-refactor.
+CLAUDE.md ("Known rough edges"): board_matrix_from_fen mutates a single
+shared matrix in place and only overwrites cells with a piece, so cells that
+go from occupied to empty between two calls keep their stale value. This is
+pinned as CURRENT behavior, not correct behavior — a future fix (Fase 5 of
+the refactor plan) should flip this test rather than silently changing
+behavior mid-refactor.
 """
 
 
-def test_get_chessboard_matrix_from_fen_starting_position(utils_android):
-    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+def test_get_chessboard_matrix_from_fen_starting_position(photochess_fen):
+    fen_str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-    matrix, turn = utils_android.getChessboardMatrixfromFen(fen)
+    matrix, turn = photochess_fen.board_matrix_from_fen(fen_str)
 
     assert turn == "w"
     assert list(matrix[0]) == ["r", "n", "b", "q", "k", "b", "n", "r"]
@@ -25,21 +26,19 @@ def test_get_chessboard_matrix_from_fen_starting_position(utils_android):
         assert list(row) == [""] * 8
 
 
-def test_get_chessboard_matrix_from_fen_black_turn(utils_android):
-    _, turn = utils_android.getChessboardMatrixfromFen(
-        "8/8/8/8/8/8/8/8 b KQkq - 0 1"
-    )
+def test_get_chessboard_matrix_from_fen_black_turn(photochess_fen):
+    _, turn = photochess_fen.board_matrix_from_fen("8/8/8/8/8/8/8/8 b KQkq - 0 1")
     assert turn == "b"
 
 
-def test_get_chessboard_matrix_from_fen_leaks_state_between_calls(utils_android):
+def test_get_chessboard_matrix_from_fen_leaks_state_between_calls(photochess_fen):
     # KNOWN BUG, pinned intentionally: parsing a full board, then an empty
     # one, does not clear the board because emptied cells are never written.
     full_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     empty_fen = "8/8/8/8/8/8/8/8 w KQkq - 0 1"
 
-    utils_android.getChessboardMatrixfromFen(full_fen)
-    matrix_after_empty, _ = utils_android.getChessboardMatrixfromFen(empty_fen)
+    photochess_fen.board_matrix_from_fen(full_fen)
+    matrix_after_empty, _ = photochess_fen.board_matrix_from_fen(empty_fen)
 
     # A correct implementation would make this an all-empty board; today it
     # still shows the starting position because nothing clears stale cells.
@@ -47,30 +46,51 @@ def test_get_chessboard_matrix_from_fen_leaks_state_between_calls(utils_android)
     assert list(matrix_after_empty[6]) == ["P"] * 8
 
 
-def test_edit_chessboard_with_moves_sets_piece(utils_android):
+def test_board_matrix_from_fen_matches_android_copy(photochess_fen, utils_android):
+    fen_str = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 2"
+
+    new_matrix, new_turn = photochess_fen.board_matrix_from_fen(fen_str)
+    android_matrix, android_turn = utils_android.getChessboardMatrixfromFen(fen_str)
+
+    assert new_turn == android_turn
+    assert new_matrix.tolist() == android_matrix.tolist()
+
+
+def test_edit_chessboard_sets_piece(photochess_fen):
     board = [["" for _ in range(8)] for _ in range(8)]
 
-    result = utils_android.editchessboardwmoves(board, "E4:White Pawn")
+    result = photochess_fen.edit_chessboard(board, "E4:White Pawn")
 
-    # E -> column 4, rank 4 -> dictCell[4] - 1 = row 4
+    # E -> column 4, rank 4 -> RANK_TO_ROW[4] - 1 = row 4
     assert result[4][4] == "P"
 
 
-def test_edit_chessboard_with_moves_clears_square(utils_android):
+def test_edit_chessboard_clears_square(photochess_fen):
     board = [["" for _ in range(8)] for _ in range(8)]
     board[0][0] = "R"
 
-    result = utils_android.editchessboardwmoves(board, "A8:Empty")
+    result = photochess_fen.edit_chessboard(board, "A8:Empty")
 
-    # A -> column 0, rank 8 -> dictCell[8] - 1 = row 0
+    # A -> column 0, rank 8 -> RANK_TO_ROW[8] - 1 = row 0
     assert result[0][0] == ""
 
 
-def test_edit_chessboard_with_moves_multiple_semicolon_separated(utils_android):
+def test_edit_chessboard_multiple_semicolon_separated(photochess_fen):
     board = [["" for _ in range(8)] for _ in range(8)]
 
-    result = utils_android.editchessboardwmoves(board, "A1:White Rook;H1:Black King")
+    result = photochess_fen.edit_chessboard(board, "A1:White Rook;H1:Black King")
 
-    # A1 -> dictCell[1]-1=7, column 0 | H1 -> row 7, column 7
+    # A1 -> RANK_TO_ROW[1]-1=7, column 0 | H1 -> row 7, column 7
     assert result[7][0] == "R"
     assert result[7][7] == "k"
+
+
+def test_edit_chessboard_matches_android_copy(photochess_fen, utils_android):
+    board_a = [["" for _ in range(8)] for _ in range(8)]
+    board_b = [["" for _ in range(8)] for _ in range(8)]
+    moves = "E4:White Pawn;A1:Black Queen;H8:Empty"
+
+    result_a = photochess_fen.edit_chessboard(board_a, moves)
+    result_b = utils_android.editchessboardwmoves(board_b, moves)
+
+    assert result_a == result_b
