@@ -26,7 +26,7 @@ android {
                 install "numpy"
                 install "scipy"
                 install "Pillow"
-                install "ultralytics"
+                install "ultralytics==8.3.100"
                 install "opencv-python"
             }
         }

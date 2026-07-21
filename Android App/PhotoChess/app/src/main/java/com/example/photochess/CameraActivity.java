@@ -1,7 +1,6 @@
 package com.example.photochess;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
@@ -16,7 +15,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,8 +25,6 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.chaquo.python.PyObject;
-import com.chaquo.python.Python;
-import com.chaquo.python.android.AndroidPlatform;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.ByteArrayOutputStream;
@@ -37,7 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-public class CameraActivity extends AppCompatActivity implements View.OnClickListener{
+public class CameraActivity extends BaseActivity implements View.OnClickListener{
     private ListenableFuture<ProcessCameraProvider> provider;
 
     private static final int PERMISSION_REQUEST_CODE = 200;
@@ -49,20 +45,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView imageView;
     private ImageCapture imageCapt;
     private ImageAnalysis imageAn;
+    private Bitmap capturedImage;
 
-    PyObject module;
+    PythonBridge pythonBridge;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        getSupportActionBar().hide();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            getWindow().setStatusBarColor(getColor(R.color.mycol));
-        }
+        applyPhotoChessChrome();
 
         if (! checkPermission())
             requestPermission();
@@ -80,11 +72,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         undoBtn.setVisibility(View.INVISIBLE);
         useBtn.setVisibility(View.INVISIBLE);
 
-        if (! Python.isStarted()) {
-            Python.start(new AndroidPlatform(this));
-        }
-        Python py = Python.getInstance();
-        module = py.getModule("android_api");
+        pythonBridge = new PythonBridge(this);
 
         provider = ProcessCameraProvider.getInstance(this);
         provider.addListener( () ->
@@ -203,10 +191,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         useBtn.setVisibility(View.INVISIBLE);
     }
     public void capturePhoto() {
-        Bitmap bitmapImage = previewView.getBitmap();
+        capturedImage = previewView.getBitmap();
         imageView.setVisibility(View.VISIBLE);
         previewView.setVisibility(View.INVISIBLE);
-        imageView.setImageBitmap(bitmapImage);
+        imageView.setImageBitmap(capturedImage);
         photoBtn.setVisibility(View.INVISIBLE);
         undoBtn.setVisibility(View.VISIBLE);
         useBtn.setVisibility(View.VISIBLE);
@@ -214,13 +202,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     public void usePhoto(){
 
-        Bitmap image = previewView.getBitmap();
+        // Bug fix: this used to send a hardcoded R.drawable.testimage to
+        // Python instead of the photo the user just captured and is
+        // looking at in imageView (see CLAUDE.md "Known rough edges" /
+        // git history). Re-fetching previewView.getBitmap() here instead
+        // would be wrong too — the live camera preview keeps running under
+        // the frozen imageView even while INVISIBLE, so that would grab
+        // whatever the camera sees *now*, not the confirmed capture. Using
+        // the bitmap capturePhoto() already froze and stored is correct.
         String[] choices = {"WHITE","BLACK"};
-        Bitmap test = BitmapFactory.decodeResource(getResources(), R.drawable.testimage);
-
-
-        int currentChoice = 0;
-        final int[] effectiveChoice = {0};
         final View customLayout = getLayoutInflater().inflate(R.layout.alert_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Whose turn is it?");
@@ -237,10 +227,10 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                         //call python function to obtain the fen
 
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        test.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        capturedImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] byteImage  = stream.toByteArray();
                         Log.e("ByteImage", byteImage.toString());
-                        PyObject fenPy = module.callAttr("main", byteImage, turn);
+                        PyObject fenPy = pythonBridge.callAttr("main", byteImage, turn);
                         Intent i = new Intent(CameraActivity.this, AnalyzeActivity.class);
                         i.putExtra("fen", fenPy.toString());
                         startActivity(i);

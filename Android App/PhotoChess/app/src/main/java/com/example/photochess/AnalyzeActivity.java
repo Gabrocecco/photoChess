@@ -1,13 +1,11 @@
 package com.example.photochess;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.PictureDrawable;
 import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,16 +20,14 @@ import android.widget.Toast;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
 import com.chaquo.python.PyObject;
-import com.chaquo.python.Python;
-import com.chaquo.python.android.AndroidPlatform;
 
 import java.util.Arrays;
 
-public class AnalyzeActivity extends AppCompatActivity {
+public class AnalyzeActivity extends BaseActivity {
 
     ImageView bestMoveBtn;
     String fen = "";
-    PyObject module;
+    PythonBridge pythonBridge;
     ImageView boardPhoto;
     View customLayout;
     AlertDialog.Builder builder;
@@ -45,24 +41,14 @@ public class AnalyzeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analyze);
-
-        getSupportActionBar().hide();
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            getWindow().setStatusBarColor(getColor(R.color.mycol));
-        }
+        applyPhotoChessChrome();
 
         Intent intent = getIntent();
         fen = intent.getExtras().getString("fen");
 
         bestMoveBtn = findViewById(R.id.bmoveBtn);
-        if (! Python.isStarted()) {
-            Python.start(new AndroidPlatform(this));
-        }
-        Python py = Python.getInstance();
-        module = py.getModule("android_api");
-        PyObject el = module.callAttr("getboard", fen);
+        pythonBridge = new PythonBridge(this);
+        PyObject el = pythonBridge.callAttr("getboard", fen);
 
         boardPhoto = findViewById(R.id.boardView);
         PictureDrawable drawable = getPictureDrawablefromSvg(el.toString());
@@ -126,7 +112,7 @@ public class AnalyzeActivity extends AppCompatActivity {
     }
 
     public void getBestMove(){
-        PyObject response = module.callAttr("getbestmove", fen);
+        PyObject response = pythonBridge.callAttr("getbestmove", fen);
         Log.e("Response", response.toString());
         if(!response.toString().equals("Error")){
             svg_array = response.toJava(String[].class);
@@ -206,9 +192,9 @@ public class AnalyzeActivity extends AppCompatActivity {
 
                 if(text.length() > 0){
 
-                    PyObject newfen = module.callAttr("getfenfromedits", fen, text);
+                    PyObject newfen = pythonBridge.callAttr("getfenfromedits", fen, text);
                     fen = newfen.toString();
-                    PyObject newImg = module.callAttr("getboard", fen);
+                    PyObject newImg = pythonBridge.callAttr("getboard", fen);
                     PictureDrawable drawable = getPictureDrawablefromSvg(newImg.toString());
                     boardPhoto.setImageDrawable(drawable);
                     changesText.setText("");
@@ -248,7 +234,7 @@ public class AnalyzeActivity extends AppCompatActivity {
         TextView numscore = analyzeLayout.findViewById(R.id.evalScore);
         TextView textscore = analyzeLayout.findViewById(R.id.vartextScore);
 
-        PyObject res = module.callAttr("geteval", fen);
+        PyObject res = pythonBridge.callAttr("geteval", fen);
         if(res.toString().equals("Error"))
         {
             Toast.makeText(this,"Invalid chessboard", Toast.LENGTH_LONG).show();
