@@ -1,14 +1,6 @@
 """Characterization tests for photochess.fen.board_matrix_from_fen and
 edit_chessboard (ported from the Android-only utils.py, pre-Fase-3; the
 desktop copy never had these before the refactor).
-
-Includes a deliberate test of the module-level state leak documented in
-CLAUDE.md ("Known rough edges"): board_matrix_from_fen mutates a single
-shared matrix in place and only overwrites cells with a piece, so cells that
-go from occupied to empty between two calls keep their stale value. This is
-pinned as CURRENT behavior, not correct behavior — a future fix (Fase 5 of
-the refactor plan) should flip this test rather than silently changing
-behavior mid-refactor.
 """
 
 
@@ -31,19 +23,19 @@ def test_get_chessboard_matrix_from_fen_black_turn(photochess_fen):
     assert turn == "b"
 
 
-def test_get_chessboard_matrix_from_fen_leaks_state_between_calls(photochess_fen):
-    # KNOWN BUG, pinned intentionally: parsing a full board, then an empty
-    # one, does not clear the board because emptied cells are never written.
+def test_get_chessboard_matrix_from_fen_does_not_leak_state_between_calls(photochess_fen):
+    # Regression test for a fixed bug (see git history / photochess/fen.py):
+    # board_matrix_from_fen used to mutate a single shared module-level
+    # matrix in place, so parsing a full board followed by an empty one
+    # left the board showing stale pieces instead of actually clearing.
     full_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     empty_fen = "8/8/8/8/8/8/8/8 w KQkq - 0 1"
 
     photochess_fen.board_matrix_from_fen(full_fen)
     matrix_after_empty, _ = photochess_fen.board_matrix_from_fen(empty_fen)
 
-    # A correct implementation would make this an all-empty board; today it
-    # still shows the starting position because nothing clears stale cells.
-    assert list(matrix_after_empty[0]) == ["r", "n", "b", "q", "k", "b", "n", "r"]
-    assert list(matrix_after_empty[6]) == ["P"] * 8
+    for row in matrix_after_empty:
+        assert list(row) == [""] * 8
 
 
 def test_edit_chessboard_sets_piece(photochess_fen):

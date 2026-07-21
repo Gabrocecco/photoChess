@@ -29,20 +29,16 @@ EDIT_PIECE_CODES = {
     "Black King": "k",
 }
 
-# Shared across calls on purpose, to preserve current behavior exactly:
-# board_matrix_from_fen only overwrites occupied cells, so an emptied square
-# keeps whatever it held on the previous call. This is a known bug (see
-# CLAUDE.md "Known rough edges" and
-# tests/unit/test_editing.py::test_get_chessboard_matrix_from_fen_leaks_state_between_calls)
-# pinned intentionally rather than fixed mid-refactor.
-_shared_board_matrix = np.array([""] * 64).reshape(-1, 8)
-
 
 def assign_pieces_to_squares(points, ptsT, ptsL, classes):
     """Snaps each (point, class) detection to its nearest of the 64 square
     centers derived from ptsT/ptsL, and returns a 64-entry FEN-piece list
     (row-major, rank 8 first). First detection to claim a square wins;
-    later ones on the same square are dropped.
+    later ones on the same square are dropped. Detections of a class not in
+    CLASS_ID_TO_FEN_PIECE (e.g. class 0, "bishop" with no color, present in
+    dataset_piecies/data.yaml but with no FEN letter to map to) are skipped
+    rather than raising KeyError — see git history for the previous
+    behavior and CLAUDE.md's "Class-index mapping" section.
     """
     square_list_centers = []
     for t in range(len(ptsT) - 2, -1, -1):
@@ -56,9 +52,12 @@ def assign_pieces_to_squares(points, ptsT, ptsL, classes):
     chessboard_list = [""] * 64
 
     for index, point in enumerate(points):
+        piece = CLASS_ID_TO_FEN_PIECE.get(classes[index].item())
+        if piece is None:
+            continue
         _, cell_index = cells.query([point[0], point[1]])
         if len(chessboard_list[cell_index]) < 1:
-            chessboard_list[cell_index] = CLASS_ID_TO_FEN_PIECE[classes[index].item()]
+            chessboard_list[cell_index] = piece
 
     return chessboard_list
 
@@ -89,6 +88,13 @@ def create_fen(chessboard_list, turn):
 
 
 def board_matrix_from_fen(fen):
+    """Returns (8x8 matrix, turn). A fresh matrix is built on every call —
+    an earlier version of this function (see git history) mutated a single
+    module-level matrix in place and only overwrote occupied cells, so a
+    square that went from occupied to empty between two calls kept its
+    stale value. Fixed here; see
+    tests/unit/test_editing.py::test_get_chessboard_matrix_from_fen_does_not_leak_state_between_calls.
+    """
     singleline = fen.split("/")
     turn = singleline[7].split(" ")[1]
     singleline[7] = singleline[7].split(" ")[0]
@@ -102,12 +108,13 @@ def board_matrix_from_fen(fen):
                 formatted_fen += ch
         formatted_fen += "/"
 
-    for row_index, row in enumerate(formatted_fen.split("/")):
+    board_matrix = np.array([""] * 64).reshape(-1, 8)
+    for row_index, row in enumerate(formatted_fen.split("/")[:8]):
         for col_index, ch in enumerate(row):
             if ch != "e":
-                _shared_board_matrix[row_index][col_index] = ch
+                board_matrix[row_index][col_index] = ch
 
-    return _shared_board_matrix, turn
+    return board_matrix, turn
 
 
 def edit_chessboard(chessboard, moves_string):

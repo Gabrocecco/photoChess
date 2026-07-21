@@ -65,6 +65,33 @@ def test_assign_pieces_to_squares_first_detection_wins_contested_square():
     assert result[0] == "P"
 
 
+def test_assign_pieces_to_squares_skips_unmapped_class_instead_of_raising():
+    # Regression test for a fixed bug: class id 0 ("bishop" with no color,
+    # see dataset_piecies/data.yaml and CLAUDE.md's "Class-index mapping")
+    # used to raise KeyError. It's now silently skipped, same as if nothing
+    # had been detected there.
+    ptsT, ptsL = _grid()
+    points = [(ptsT[7][0] + 5, ptsL[0][1] + 5)]
+    classes = _FakeClasses([0])
+
+    result = fen.assign_pieces_to_squares(points, ptsT, ptsL, classes)
+
+    assert result == [""] * 64
+
+
+def test_assign_pieces_to_squares_unmapped_class_does_not_block_mapped_one():
+    ptsT, ptsL = _grid()
+    unmapped_point = (ptsT[7][0] + 5, ptsL[0][1] + 5)  # square index 0
+    mapped_point = (ptsT[7][0] + 5, ptsL[1][1] + 5)    # square index 1
+    points = [unmapped_point, mapped_point]
+    classes = _FakeClasses([0, 10])  # unmapped, then 'P'
+
+    result = fen.assign_pieces_to_squares(points, ptsT, ptsL, classes)
+
+    assert result[0] == ""
+    assert result[1] == "P"
+
+
 def _grid():
     from photochess import geometry
     return geometry.grid_points(80, 80)
