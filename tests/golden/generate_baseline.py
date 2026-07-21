@@ -33,8 +33,8 @@ def main():
     parser.add_argument("--turn", default="w")
     args = parser.parse_args()
 
-    model_pieces = detect.load_piece_model(str(REPO_ROOT / "best_piecies.pt"))
-    model_corner = detect.load_corner_model(str(REPO_ROOT / "best_corners.pt"))
+    model_pieces = detect.load_piece_model(str(REPO_ROOT / "models" / "best_piecies.pt"))
+    model_corner = detect.load_corner_model(str(REPO_ROOT / "models" / "best_corners.pt"))
 
     test_images_dir = REPO_ROOT / "test_images"
     image_paths = sorted(

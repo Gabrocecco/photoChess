@@ -10,7 +10,7 @@ import sys
 
 from photochess import detect, pipeline
 
-WEIGHTS_DIR = "."
+WEIGHTS_DIR = "models"
 
 
 def main(image_path, turn="w"):

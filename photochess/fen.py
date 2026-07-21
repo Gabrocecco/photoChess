@@ -36,7 +36,7 @@ def assign_pieces_to_squares(points, ptsT, ptsL, classes):
     (row-major, rank 8 first). First detection to claim a square wins;
     later ones on the same square are dropped. Detections of a class not in
     CLASS_ID_TO_FEN_PIECE (e.g. class 0, "bishop" with no color, present in
-    dataset_piecies/data.yaml but with no FEN letter to map to) are skipped
+    datasets/piecies/data.yaml but with no FEN letter to map to) are skipped
     rather than raising KeyError — see git history for the previous
     behavior and CLAUDE.md's "Class-index mapping" section.
     """

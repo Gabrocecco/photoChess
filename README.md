@@ -1,5 +1,5 @@
 # PhotoChess
-![app](https://github.com/Gabrocecco/photoChess/blob/main/app.png)
+![app](docs/images/app.png)
 
 Authors: 
 

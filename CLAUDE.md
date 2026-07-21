@@ -8,6 +8,24 @@ PhotoChess turns a photo of a physical chessboard into a FEN string, then into e
 
 ## Repository layout: refactor in progress
 
+Top-level layout, after reorganizing what used to be loose files and datasets scattered directly at repo root:
+
+```
+photochess/           canonical recognition pipeline (see below)
+Android App/          the Chaquopy Android app
+models/               best_corners.pt, best_piecies.pt (promoted training output)
+datasets/piecies/     roboflow-exported YOLO dataset for piece detection
+datasets/corners_labeled/  roboflow-exported YOLO dataset for corner detection
+training/             yoloTrainingColab.ipynb + training_output/ (past Colab runs)
+test_images/          real board photos used by tests/golden/
+tests/                golden + unit tests (the refactor's safety net)
+docs/images/          README illustrations, including the pipeline walkthrough
+pipeline.py           thin desktop CLI over photochess/
+requirements.lock     pinned desktop Python env
+```
+
+`non_production_archive/` (abandoned Harris/contour experiments) still exists on disk but is no longer tracked — see "Known rough edges" below.
+
 **A repo-wide refactor is underway (tracked in-session, no separate design doc).** Status:
 
 - **Done (Fase 0-4):** `photochess/` (repo root) is the single canonical implementation of the recognition pipeline — `geometry.py` (order_points, homography, grid interpolation, pure), `fen.py` (create_fen, assign_pieces_to_squares, board_matrix_from_fen, edit_chessboard, pure), `detect.py` (YOLO wrapper), `pipeline.py` (orchestration: `recognize_board(image, turn, model_pieces, model_corner)`). Root [pipeline.py](pipeline.py) is a thin CLI (`python pipeline.py <image> [w|b]`) over that package. `Android App/PhotoChess/app/src/main/python/photochess/` is a **byte-for-byte copy** of it (enforced by `tests/unit/test_android_sync.py`) — Android no longer has its own independent recognition logic. `android_api.py` (the Chaquopy-facing facade Java actually calls) and `engine.py` (Stockfish/SVG, Android-only) replace what used to be Android's own `pipeline.py`/`utils.py`/`getbestmove.py`/`constants.py`, all now deleted. On the Java side, `BaseActivity` (chrome + Python-VM-startup helpers) and `PythonBridge` (a thin `callAttr` passthrough wrapping module lookup) replace three copies of the same boilerplate across `MainActivity`/`CameraActivity`/`AnalyzeActivity`. `CameraActivity.usePhoto()`'s capture bug is fixed (see "Known rough edges" history below).
@@ -31,8 +49,8 @@ PhotoChess turns a photo of a physical chessboard into a FEN string, then into e
 
 `photochess.pipeline.recognize_board(image, turn, model_pieces, model_corner)` — `turn` is `"w"` or `"b"` — runs these stages in order. Both the desktop CLI (`pipeline.py`) and the Android facade (`android_api.py`) call this same function now.
 
-1. Piece detection on the **original, unwarped** photo (`best_piecies.pt`, `iou=0.2`). Detecting before warping is intentional: pieces are tall 3D objects and warping the image first distorts them badly.
-2. Corner detection (`best_corners.pt`, `conf=0.001`, `max_det=4`) → exactly 4 points, ordered TL/TR/BR/BL by `geometry.order_points` (sum/diff-of-coordinates trick).
+1. Piece detection on the **original, unwarped** photo (`models/best_piecies.pt`, `iou=0.2`). Detecting before warping is intentional: pieces are tall 3D objects and warping the image first distorts them badly.
+2. Corner detection (`models/best_corners.pt`, `conf=0.001`, `max_det=4`) → exactly 4 points, ordered TL/TR/BR/BL by `geometry.order_points` (sum/diff-of-coordinates trick).
 3. `geometry.compute_homography` (`cv2.getPerspectiveTransform`) → homography `M` → bird's-eye warp (`geometry.warp_image`).
 4. Each piece's bounding-box center is pushed through `M` via `geometry.shift_point_to_square`, then shifted **down** by `height * 0.4` (marked `#PARAMETER SHIFT` in the pre-refactor source). This is the tuned magic constant that moves a detection from the middle of a standing piece to the square its base occupies. Changing it changes recognition accuracy more than anything else in the file.
 5. `geometry.grid_points` interpolates 9 evenly spaced points along the top and left edges of the warped board.
@@ -43,7 +61,7 @@ Castling rights, en-passant and move counters are always hardcoded in the FEN su
 
 ### Class-index mapping
 
-`fen.CLASS_ID_TO_FEN_PIECE` maps YOLO class ids `1..12` → FEN letters, but `dataset_piecies/data.yaml` declares `nc: 13` with class `0` being a generic, colorless `'bishop'` — there's no FEN letter to map it to (a piece needs a color). `assign_pieces_to_squares` skips class-0 detections rather than erroring, same as if nothing had been detected on that square. If you retrain or swap datasets, this mapping is the thing to check.
+`fen.CLASS_ID_TO_FEN_PIECE` maps YOLO class ids `1..12` → FEN letters, but `datasets/piecies/data.yaml` declares `nc: 13` with class `0` being a generic, colorless `'bishop'` — there's no FEN letter to map it to (a piece needs a color). `assign_pieces_to_squares` skips class-0 detections rather than erroring, same as if nothing had been detected on that square. If you retrain or swap datasets, this mapping is the thing to check.
 
 ## Android app
 
@@ -82,7 +100,7 @@ pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requiremen
 
 Use `--extra-index-url`, not `--index-url` — the latter replaces the default PyPI index instead of adding to it, and `download.pytorch.org` doesn't mirror the rest of PyPI (unrelated packages like `certifi` fail to resolve at all). `torch`/`torchvision` still specifically need that index — installing torchvision from default PyPI against a CPU-only torch build fails at import with `operator torchvision::nms does not exist`. The lock was pinned on Python 3.14 (the only interpreter available at the time); Chaquopy resolves the same package names independently against its own Android wheel index, so this lock does not guarantee identical behavior on-device — see the comment header in the file and the Fase 3/4 notes above for the confirmed real differences (`torch==1.8.1` vs `2.13.0`, etc).
 
-Training is not done in this repo — it runs in Colab via [yoloTrainingColab.ipynb](yoloTrainingColab.ipynb) (`yolo train model=yolov8n.pt data=.../data.yaml epochs=200 imgsz=640`) against a Drive-mounted dataset; results were downloaded into `training_output/` and the chosen weights promoted to `best_corners.pt` / `best_piecies.pt`.
+Training is not done in this repo — it runs in Colab via [training/yoloTrainingColab.ipynb](training/yoloTrainingColab.ipynb) (`yolo train model=yolov8n.pt data=.../data.yaml epochs=200 imgsz=640`) against a Drive-mounted dataset; results were downloaded into `training/training_output/` and the chosen weights promoted to `models/best_corners.pt` / `models/best_piecies.pt`.
 
 ## Testing (refactor safety net)
 
@@ -91,7 +109,7 @@ There was no test suite before the ongoing refactor; `tests/` exists to pin *cur
 ```bash
 python -m pytest tests/unit              # pure-logic characterization tests, no ML deps needed, <1s
 python tests/golden/check_baseline.py    # reruns photochess.pipeline on test_images/, diffs vs tests/golden/fens.json
-sha256sum -c tests/golden/weights.sha256 # confirms best_corners.pt / best_piecies.pt haven't changed
+sha256sum -c tests/golden/weights.sha256 # confirms models/best_corners.pt / models/best_piecies.pt haven't changed
 ```
 
 `tests/golden/fens.json` is the FEN output on every real board photo under `test_images/` (excluding `test_images/outputs/`, which holds abandoned Harris-corner-detection artifacts, not board photos), verified two ways before being trusted: bit-for-bit deterministic across repeated runs on CPU, and cross-checked entry-by-entry against the literal, unmodified pre-refactor `pipeline.main()` (not just against itself) — that second check is what caught and fixed a bug in the *baseline generator itself* (see the Fase 2 commit). `tests/unit/` exercises `photochess.geometry`/`photochess.fen` directly, including regression tests for the two bugs fixed in Fase 5 (`test_editing.py::test_get_chessboard_matrix_from_fen_does_not_leak_state_between_calls`, `test_fen.py::test_assign_pieces_to_squares_skips_unmapped_class_instead_of_raising`). `test_android_sync.py` checks the Android `photochess/` copy stays byte-identical to the root one (see the Fase 3 caveat above on why it's a copy at all — this means editing `photochess/` requires copying the changed file(s) into `Android App/PhotoChess/app/src/main/python/photochess/` too).
@@ -102,4 +120,4 @@ sha256sum -c tests/golden/weights.sha256 # confirms best_corners.pt / best_pieci
 
 - `AnalyzeActivity.analyzeMatch()`'s negative-score check is `res.toString().substring(0,1).equals('-')` — comparing a `String` to a `char` via `.equals()`, which autoboxes the `char` to `Character` and can never equal a `String`. That branch (labeling the score "BLACK") is dead code; pre-existing, not introduced by this refactor, not fixed — cosmetic (the final `else` still shows a plausible label) and low-risk to leave alone rather than touch speculatively.
 - A Lichess API token was committed in the old Android `utils.py`/`pipeline.py`/`getbestmove.py` (all now deleted) for a `berserk`-based analysis path that was already dead code (commented out, never called). The token itself is still in **git history** — deleting the files didn't revoke it; that needs doing on Lichess's side.
-- `non_production_archive/` (175 MB) holds abandoned Harris/contour corner-detection experiments, not part of the working pipeline — not yet removed from tracking, unlike the generated-output dirs `.gitignore` now excludes. `dataset_corners_labeled/`, `dataset_piecies/`, and `training_output/` are also still fully tracked (not yet moved to Git LFS or an external download step).
+- `non_production_archive/` (175 MB) holds abandoned Harris/contour corner-detection experiments, not part of the working pipeline. Untracked (added to `.gitignore`) rather than deleted from disk — it's still there locally and still in git history, it just no longer shows up in a fresh clone or the GitHub file browser. `datasets/piecies/`, `datasets/corners_labeled/`, and `training/training_output/` are legitimate provenance (labeled training data, past training runs) and are still fully tracked — not yet moved to Git LFS or an external download step, so a fresh clone of this repo is still large (~100+ MB of datasets alone).

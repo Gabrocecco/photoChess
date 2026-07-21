@@ -67,7 +67,7 @@ def test_assign_pieces_to_squares_first_detection_wins_contested_square():
 
 def test_assign_pieces_to_squares_skips_unmapped_class_instead_of_raising():
     # Regression test for a fixed bug: class id 0 ("bishop" with no color,
-    # see dataset_piecies/data.yaml and CLAUDE.md's "Class-index mapping")
+    # see datasets/piecies/data.yaml and CLAUDE.md's "Class-index mapping")
     # used to raise KeyError. It's now silently skipped, same as if nothing
     # had been detected there.
     ptsT, ptsL = _grid()

@@ -16,3 +16,8 @@ yolo_output_final_warped/
 /warped_image.jpg
 /warped_image_with_detects.jpg
 /chessboard_transformed_with_grid.jpg
+
+# Abandoned Harris/contour corner-detection experiments, not part of the
+# working pipeline (see CLAUDE.md "Known rough edges"). Kept on disk, not
+# tracked going forward.
+/non_production_archive/

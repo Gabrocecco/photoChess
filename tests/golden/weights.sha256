@@ -3,7 +3,7 @@
 # future dedup (single weights file, copied at build time) is verified by
 # the same checksums. Verify with:
 #   sha256sum -c tests/golden/weights.sha256
-420c360842fcc8dd3b0d423aa5ea0c04681dbc991c640cb5e378de023fcf917b  best_corners.pt
-b7a3a7e1b5a6665663a8cb688d2088f14721936b1892b12ecc5c645b17417c7f  best_piecies.pt
+420c360842fcc8dd3b0d423aa5ea0c04681dbc991c640cb5e378de023fcf917b  models/best_corners.pt
+b7a3a7e1b5a6665663a8cb688d2088f14721936b1892b12ecc5c645b17417c7f  models/best_piecies.pt
 420c360842fcc8dd3b0d423aa5ea0c04681dbc991c640cb5e378de023fcf917b  Android App/PhotoChess/app/src/main/python/best_corners.pt
 b7a3a7e1b5a6665663a8cb688d2088f14721936b1892b12ecc5c645b17417c7f  Android App/PhotoChess/app/src/main/python/best_piecies.pt
