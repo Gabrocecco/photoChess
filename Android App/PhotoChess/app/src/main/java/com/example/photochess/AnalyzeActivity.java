@@ -61,7 +61,7 @@ public class AnalyzeActivity extends AppCompatActivity {
             Python.start(new AndroidPlatform(this));
         }
         Python py = Python.getInstance();
-        module = py.getModule("pipeline");
+        module = py.getModule("android_api");
         PyObject el = module.callAttr("getboard", fen);
 
         boardPhoto = findViewById(R.id.boardView);

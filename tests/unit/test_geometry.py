@@ -40,22 +40,6 @@ def test_order_points_is_permutation_invariant():
     np.testing.assert_array_equal(ordered[3], [10, 110])
 
 
-def test_order_points_matches_android_copy(utils_android):
-    # photochess.geometry.order_points must stay byte-identical to the
-    # still-shipping Android copy until Fase 3 wires Android to photochess/.
-    pts = np.array([
-        [87.0, 12.0],
-        [412.0, 30.0],
-        [430.0, 401.0],
-        [70.0, 388.0],
-    ], dtype="float32")
-
-    new_result = geometry.order_points(pts.copy())
-    android_result = utils_android.order_points(pts.copy())
-
-    np.testing.assert_array_equal(new_result, android_result)
-
-
 def test_grid_points_endpoints():
     ptsT, ptsL = geometry.grid_points(800, 400)
 
@@ -67,17 +51,6 @@ def test_grid_points_endpoints():
     # left edge runs top-to-bottom along x=0
     assert ptsL[0] == (0.0, 0.0)
     assert ptsL[-1] == (0.0, 400.0)
-
-
-def test_grid_points_matches_android_copy(utils_android):
-    class FakeImage:
-        size = (800, 400)
-
-    expected_ptsT, expected_ptsL = utils_android.plot_grid_on_transformed_image(FakeImage())
-    ptsT, ptsL = geometry.grid_points(800, 400)
-
-    assert ptsT == expected_ptsT
-    assert ptsL == expected_ptsL
 
 
 def test_compute_homography_axis_aligned_square():

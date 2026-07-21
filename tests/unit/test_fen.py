@@ -1,9 +1,5 @@
 """Characterization tests for photochess.fen.create_fen (run-length encoding
-of the 64-cell board into FEN). Root and Android utils.py used to share this
-exact function (same signature); getbestmove.py has a superseded,
-differently-signed copy (create_fen(matrix) with no turn arg) that was dead
-code even before the refactor — pipeline.py imported create_fen from
-utils.py, never from getbestmove.py.
+of the 64-cell board into FEN).
 """
 from photochess import fen
 
@@ -43,17 +39,6 @@ def test_create_fen_mixed_run_lengths():
 
     assert result.split("/")[0] == "2P5"
     assert result.endswith(" b KQkq - 0 1")
-
-
-def test_create_fen_matches_android_copy(utils_android):
-    row1 = ["r", "", "b", "q", "k", "b", "n", "r"]
-    row2 = ["p", "p", "p", "p", "", "p", "p", "p"]
-    board = row1 + row2 + [""] * 48
-
-    new_fen = fen.create_fen(board, "w")
-    android_fen = utils_android.create_fen(board, "w")
-
-    assert new_fen == android_fen
 
 
 def test_assign_pieces_to_squares_single_piece():

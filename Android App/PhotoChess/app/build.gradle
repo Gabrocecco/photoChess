@@ -23,12 +23,11 @@ android {
         python {
             pip {
                 install "chess==1.10.0"
-                install "berserk"
                 install "numpy"
+                install "scipy"
                 install "Pillow"
                 install "ultralytics"
                 install "opencv-python"
-                install "matplotlib"
             }
         }
     }

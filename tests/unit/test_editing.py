@@ -1,6 +1,6 @@
 """Characterization tests for photochess.fen.board_matrix_from_fen and
-edit_chessboard (ported from the Android-only utils.py; the desktop copy
-never had these).
+edit_chessboard (ported from the Android-only utils.py, pre-Fase-3; the
+desktop copy never had these before the refactor).
 
 Includes a deliberate test of the module-level state leak documented in
 CLAUDE.md ("Known rough edges"): board_matrix_from_fen mutates a single
@@ -46,16 +46,6 @@ def test_get_chessboard_matrix_from_fen_leaks_state_between_calls(photochess_fen
     assert list(matrix_after_empty[6]) == ["P"] * 8
 
 
-def test_board_matrix_from_fen_matches_android_copy(photochess_fen, utils_android):
-    fen_str = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 2"
-
-    new_matrix, new_turn = photochess_fen.board_matrix_from_fen(fen_str)
-    android_matrix, android_turn = utils_android.getChessboardMatrixfromFen(fen_str)
-
-    assert new_turn == android_turn
-    assert new_matrix.tolist() == android_matrix.tolist()
-
-
 def test_edit_chessboard_sets_piece(photochess_fen):
     board = [["" for _ in range(8)] for _ in range(8)]
 
@@ -83,14 +73,3 @@ def test_edit_chessboard_multiple_semicolon_separated(photochess_fen):
     # A1 -> RANK_TO_ROW[1]-1=7, column 0 | H1 -> row 7, column 7
     assert result[7][0] == "R"
     assert result[7][7] == "k"
-
-
-def test_edit_chessboard_matches_android_copy(photochess_fen, utils_android):
-    board_a = [["" for _ in range(8)] for _ in range(8)]
-    board_b = [["" for _ in range(8)] for _ in range(8)]
-    moves = "E4:White Pawn;A1:Black Queen;H8:Empty"
-
-    result_a = photochess_fen.edit_chessboard(board_a, moves)
-    result_b = utils_android.editchessboardwmoves(board_b, moves)
-
-    assert result_a == result_b

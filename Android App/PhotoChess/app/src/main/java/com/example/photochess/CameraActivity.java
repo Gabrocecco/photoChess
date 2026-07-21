@@ -84,7 +84,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             Python.start(new AndroidPlatform(this));
         }
         Python py = Python.getInstance();
-        module = py.getModule("pipeline");
+        module = py.getModule("android_api");
 
         provider = ProcessCameraProvider.getInstance(this);
         provider.addListener( () ->
